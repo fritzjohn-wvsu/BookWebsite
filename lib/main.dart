@@ -29,12 +29,13 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 10, 1, 0)),
           useMaterial3: true,
         ),
         initialRoute: 'Homepage',
         routes: {
-          'Homepage': (BuildContext ctx) => Homepage(),
+          'Homepage': (BuildContext ctx) => const Homepage(),
         });
   }
 }
