@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'navigation.dart'; // Import the navigation bar
 import 'bodysection.dart'; // Import the body section
 import 'popular.dart'; // Import the popular books section
+import 'update.dart';
+import 'footer.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -21,11 +23,15 @@ class _HomepageState extends State<Homepage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              navigationBar(), // Calling the navigation bar function
+              navigationBar(context), // Calling the navigation bar function
               const SizedBox(height: 100), // Space between sections
               bodySection(), // Calling the body section function
               const SizedBox(height: 200), // Space between sections
               popularBook(), // Calling the popular books section function
+              const SizedBox(height: 100),
+              updateList(),
+              const SizedBox(height: 100),
+              footerPage(),
             ],
           ),
         ),

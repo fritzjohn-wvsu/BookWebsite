@@ -76,8 +76,8 @@ Widget bodySection() {
             height: 50, // Set the fixed height for the button
             padding: const EdgeInsets.symmetric(
                 vertical: 10, horizontal: 10), // Padding inside the button
-            decoration: BoxDecoration(
-              color: const Color(0xffe3eed4), // Background color of the button
+            decoration: const BoxDecoration(
+              color: Color(0xffe3eed4), // Background color of the button
             ),
             child: const Center(
               child: Text(
