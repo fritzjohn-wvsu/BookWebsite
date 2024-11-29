@@ -9,27 +9,28 @@ class BookList extends StatefulWidget {
 }
 
 class _BookListPageState extends State<BookList> {
-  List<dynamic> books = []; // Updated from 'meals' to 'books'
+  List<dynamic> meals = [];
 
   @override
   void initState() {
     super.initState();
-    fetchBooks(); // Fetch books when the page is initialized
+    fetchMeals(); // Fetch meals when the page is initialized
   }
 
-  // Fetch book data from the Google Books API
-  Future<void> fetchBooks() async {
+  // Fetch meal data from TheMealDB API
+  Future<void> fetchMeals() async {
     final url =
-        'https://www.googleapis.com/books/v1/volumes?q=romance&key=AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk'; // API link
+        //https://www.googleapis.com/books/v1/volumes?q=a&key=AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk
+        'https://www.themealdb.com/api/json/v1/1/search.php?f=b'; // API link for meals starting with 'A'
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
-        books = data['items'] ?? []; // Use the 'items' array from the API
+        meals = data['meals'] ?? []; // Use the 'meals' data
       });
     } else {
-      throw Exception('Failed to load books');
+      throw Exception('Failed to load meals');
     }
   }
 
@@ -39,8 +40,9 @@ class _BookListPageState extends State<BookList> {
       body: Column(
         children: [
           navigationBar(context), // Call the navigationBar widget here
+          // Remove the SizedBox or Padding between navigation and BookList
           Expanded(
-            child: books.isEmpty
+            child: meals.isEmpty
                 ? Center(
                     child: CircularProgressIndicator(),
                   ) // Show loading indicator
@@ -54,6 +56,7 @@ class _BookListPageState extends State<BookList> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Title for the meals section
                           const Text(
                             "Book List",
                             style: TextStyle(
@@ -68,19 +71,33 @@ class _BookListPageState extends State<BookList> {
                             height: 20,
                           ),
                           const SizedBox(height: 25),
-                          // Generate rows of books
-                          Column(
-                            children: books.map((book) {
-                              final volumeInfo = book['volumeInfo'];
-                              final title = volumeInfo['title'] ?? 'No Title';
-                              final description =
-                                  volumeInfo['description'] ?? 'No Description';
-                              final thumbnail = volumeInfo['imageLinks']
-                                      ?['thumbnail'] ??
-                                  ''; // Thumbnail URL
-                              return _bookRectangle(
-                                  title, thumbnail, description);
-                            }).toList(),
+                          // Row of small rectangles for meals (Meals 1 to 5)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: meals
+                                .sublist(
+                                    0,
+                                    meals.length > 5
+                                        ? 5
+                                        : meals.length) // Safe sublist
+                                .map((meal) => _bookRectangle(
+                                    meal['strMeal'],
+                                    meal[
+                                        'strMealThumb'])) // Passing meal name and image URL
+                                .toList(),
+                          ),
+                          const SizedBox(height: 25),
+                          // Row of small rectangles for meals (Meals 6 to 10)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: meals.length > 5
+                                ? meals
+                                    .sublist(5,
+                                        meals.length > 10 ? 10 : meals.length)
+                                    .map((meal) => _bookRectangle(
+                                        meal['strMeal'], meal['strMealThumb']))
+                                    .toList()
+                                : [], // Empty row if less than 6 meals
                           ),
                           const SizedBox(height: 50),
                         ],
@@ -93,40 +110,28 @@ class _BookListPageState extends State<BookList> {
     );
   }
 
-  // Helper widget to create a rectangle for each book
-  Widget _bookRectangle(String title, String imageUrl, String description) {
+  // Helper widget to create a rectangle for each meal inside a book-like style
+  Widget _bookRectangle(String mealName, String imageUrl) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 200,
           height: 300,
           color: const Color(0xffe3eed4), // Light color for the container
-          child: imageUrl.isNotEmpty
+          child: imageUrl != null && imageUrl.isNotEmpty
               ? Image.network(imageUrl, fit: BoxFit.cover)
-              : const Icon(Icons.book,
+              : const Icon(Icons.restaurant,
                   size: 100, color: Colors.grey), // Default icon if no image
         ),
         const SizedBox(height: 10),
         Text(
-          title,
+          mealName,
           style: const TextStyle(
             color: Color(0xffe3eed4), // Text color
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 5),
-        Text(
-          description,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Color(0xffe3eed4), // Text color
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 20),
       ],
     );
   }
