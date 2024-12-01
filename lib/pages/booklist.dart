@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:platform_proxy/platform_proxy.dart';
 import 'navigation.dart'; // Import the navigation bar file
 
 class BookList extends StatefulWidget {
@@ -9,28 +10,32 @@ class BookList extends StatefulWidget {
 }
 
 class _BookListPageState extends State<BookList> {
-  List<dynamic> meals = [];
+  List<dynamic> books = [];
 
   @override
   void initState() {
+    
     super.initState();
-    fetchMeals(); // Fetch meals when the page is initialized
+    fetchBooks();
   }
 
-  // Fetch meal data from TheMealDB API
-  Future<void> fetchMeals() async {
+  // Fetch book data from the Google Books API
+  Future<void> fetchBooks() async {
     final url =
-        //https://www.googleapis.com/books/v1/volumes?q=a&key=AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk
-        'https://www.themealdb.com/api/json/v1/1/search.php?f=b'; // API link for meals starting with 'A'
-    final response = await http.get(Uri.parse(url));
+        'https://www.googleapis.com/books/v1/volumes?q=flutter&key=AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk'; // Replace with your API key
+    try {
+      final response = await http.get(Uri.parse(url));
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> data = json.decode(response.body);
-      setState(() {
-        meals = data['meals'] ?? []; // Use the 'meals' data
-      });
-    } else {
-      throw Exception('Failed to load meals');
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        setState(() {
+          books = data['items'] ?? [];
+        });
+      } else {
+        throw Exception('Failed to fetch books: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Error fetching books: $error');
     }
   }
 
@@ -39,29 +44,26 @@ class _BookListPageState extends State<BookList> {
     return Scaffold(
       body: Column(
         children: [
-          navigationBar(context), // Call the navigationBar widget here
-          // Remove the SizedBox or Padding between navigation and BookList
+          navigationBar(context),
           Expanded(
-            child: meals.isEmpty
+            child: books.isEmpty
                 ? Center(
                     child: CircularProgressIndicator(),
-                  ) // Show loading indicator
+                  )
                 : SingleChildScrollView(
                     child: Container(
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 0, 15,
-                            22), // Set the container background color
+                        color: Color.fromARGB(255, 0, 15, 22),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title for the meals section
                           const Text(
                             "Book List",
                             style: TextStyle(
                               fontSize: 30,
-                              color: Color(0xffe3eed4), // Light text color
+                              color: Color(0xffe3eed4),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -71,33 +73,15 @@ class _BookListPageState extends State<BookList> {
                             height: 20,
                           ),
                           const SizedBox(height: 25),
-                          // Row of small rectangles for meals (Meals 1 to 5)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: meals
-                                .sublist(
-                                    0,
-                                    meals.length > 5
-                                        ? 5
-                                        : meals.length) // Safe sublist
-                                .map((meal) => _bookRectangle(
-                                    meal['strMeal'],
-                                    meal[
-                                        'strMealThumb'])) // Passing meal name and image URL
-                                .toList(),
-                          ),
-                          const SizedBox(height: 25),
-                          // Row of small rectangles for meals (Meals 6 to 10)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: meals.length > 5
-                                ? meals
-                                    .sublist(5,
-                                        meals.length > 10 ? 10 : meals.length)
-                                    .map((meal) => _bookRectangle(
-                                        meal['strMeal'], meal['strMealThumb']))
-                                    .toList()
-                                : [], // Empty row if less than 6 meals
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: books.map((book) {
+                              final title = book['volumeInfo']['title'] ?? "No Title";
+                              final imageLinks = book['volumeInfo']['imageLinks'];
+                              final imageUrl = imageLinks != null ? imageLinks['thumbnail'] : null;
+                              return _bookRectangle(title, imageUrl);
+                            }).toList(),
                           ),
                           const SizedBox(height: 50),
                         ],
@@ -110,29 +94,46 @@ class _BookListPageState extends State<BookList> {
     );
   }
 
-  // Helper widget to create a rectangle for each meal inside a book-like style
-  Widget _bookRectangle(String mealName, String imageUrl) {
-    return Column(
-      children: [
-        Container(
-          width: 200,
-          height: 300,
-          color: const Color(0xffe3eed4), // Light color for the container
-          child: imageUrl != null && imageUrl.isNotEmpty
-              ? Image.network(imageUrl, fit: BoxFit.cover)
-              : const Icon(Icons.restaurant,
-                  size: 100, color: Colors.grey), // Default icon if no image
+  Widget _bookRectangle(String bookTitle, String? imageUrl) {
+  final secureImageUrl = imageUrl?.replaceFirst('http:', 'https:');
+  
+  return Column(
+    children: [
+      Container(
+        width: 150,
+        height: 200,
+        color: const Color(0xffe3eed4),
+        child: secureImageUrl != null
+            ? Image.network(
+                secureImageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(
+                    Icons.broken_image,
+                    size: 100,
+                    color: Colors.grey,
+                  );
+                },
+              )
+            : const Icon(
+                Icons.broken_image,
+                size: 100,
+                color: Colors.grey,
+              ),
+      ),
+      const SizedBox(height: 10),
+      Text(
+        bookTitle,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Color(0xffe3eed4),
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
         ),
-        const SizedBox(height: 10),
-        Text(
-          mealName,
-          style: const TextStyle(
-            color: Color(0xffe3eed4), // Text color
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+    ],
+  );
+}
 }

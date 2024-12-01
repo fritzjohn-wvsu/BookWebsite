@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:main/pages/homepage.dart';
 import 'booklist.dart';
+import 'about.dart';
+import 'search.dart'; // Import the Search page
 
 Widget navigationBar(BuildContext context) {
+  final TextEditingController searchController = TextEditingController();
+
   return Container(
-    color: const Color.fromARGB(255, 0, 15, 22), // Set background color here
-    padding: const EdgeInsets.symmetric(
-        vertical: 15, horizontal: 20), // Padding for better spacing
+    color: const Color.fromARGB(255, 0, 15, 22),
+    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
-        // Left side content: Logo and LITFinds text
+        // Left side: Logo and LITFinds
         Row(
           children: [
             Image.asset(
-              'assets/icon.png', // Path to your icon
+              'assets/icon.png',
               width: 40,
               height: 40,
               fit: BoxFit.contain,
@@ -26,8 +29,7 @@ Widget navigationBar(BuildContext context) {
                 'LITFinds',
                 style: TextStyle(
                   color: Color(0xffe3eed4),
-                  fontFamily:
-                      "TanMerigue", // Ensure this font exists or choose another
+                  fontFamily: "TanMerigue",
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -35,7 +37,7 @@ Widget navigationBar(BuildContext context) {
             ),
           ],
         ),
-        // Middle content: Home, About, Books
+        // Middle: Home, About, Books
         Row(
           children: [
             TextButton(
@@ -43,7 +45,7 @@ Widget navigationBar(BuildContext context) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => Homepage()),
-                ); // Add your navigation for Home page
+                );
               },
               child: const Text(
                 'Home',
@@ -52,7 +54,10 @@ Widget navigationBar(BuildContext context) {
             ),
             TextButton(
               onPressed: () {
-                // Add your navigation for About page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => About()),
+                );
               },
               child: const Text(
                 'About',
@@ -73,14 +78,15 @@ Widget navigationBar(BuildContext context) {
             ),
           ],
         ),
-        // Right side content: Search bar and user icon
+        // Right side: Search bar and user icon
         Row(
           children: [
-            // Search bar integrated directly within the navigation bar
+            // Search bar
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              width: 250, // Adjust width to fit the screen
+              width: 250,
               child: TextField(
+                controller: searchController,
                 decoration: InputDecoration(
                   hintText: 'Search...',
                   border: OutlineInputBorder(
@@ -92,6 +98,17 @@ Widget navigationBar(BuildContext context) {
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
                     vertical: 12.0,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search, color: Color.fromARGB(255, 0, 15, 22)),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchPage(query: searchController.text),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
