@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:main/pages/homepage.dart';
+import 'booklist.dart';
+import 'about.dart';
+import 'search.dart';
 
 class footerPage extends StatelessWidget {
   const footerPage({super.key});
@@ -17,7 +21,10 @@ class footerPage extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: () {
-                  // Navigate to Home
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Homepage()),
+                );
                 },
                 child: const Text(
                   "Home",
@@ -31,7 +38,10 @@ class footerPage extends StatelessWidget {
               const SizedBox(width: 20),
               TextButton(
                 onPressed: () {
-                  // Navigate to About
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => About()),
+                );
                 },
                 child: const Text(
                   "About",
@@ -45,7 +55,10 @@ class footerPage extends StatelessWidget {
               const SizedBox(width: 20),
               TextButton(
                 onPressed: () {
-                  // Navigate to Books
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BookListWidget()),
+                );
                 },
                 child: const Text(
                   "Books",
