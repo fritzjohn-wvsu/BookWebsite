@@ -12,15 +12,15 @@ class About extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
-      body: Column(
-        children: [
-          // Include the navigation bar at the top
-          navigationBar(context),
-          // The rest of the page content
-          Expanded(
-            child: Center(
+      body: SingleChildScrollView( // Wrap the content with SingleChildScrollView
+        child: Column(
+          children: [
+            // Include the navigation bar at the top
+            navigationBar(context),
+            // The rest of the page content
+            Center(
               child: Container(
-                width: screenWidth > 600 ? 900 : screenWidth * 0.9, // Responsive width
+                width: 1450, // Responsive width
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -48,10 +48,10 @@ class About extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          // Footer section
-          footerPage(),
-        ],
+            // Footer section
+            footerPage(),
+          ],
+        ),
       ),
     );
   }
@@ -60,7 +60,7 @@ class About extends StatelessWidget {
   Widget _buildImageSection() {
     return Container(
       width: 300,
-      height: 400,
+      height: 500,
       decoration: BoxDecoration(
         color: Color.fromARGB(255, 0, 15, 22),
         borderRadius: BorderRadius.circular(12),
@@ -107,5 +107,3 @@ class About extends StatelessWidget {
     );
   }
 }
-
-

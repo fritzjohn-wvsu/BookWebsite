@@ -68,7 +68,7 @@ Widget navigationBar(BuildContext context) {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => BookList()),
+                  MaterialPageRoute(builder: (context) => BookListWidget()),
                 );
               },
               child: const Text(

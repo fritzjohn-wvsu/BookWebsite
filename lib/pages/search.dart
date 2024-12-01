@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'homepage.dart'; // Assuming you have a Homepage widget
-import 'navigation.dart'; // Import your navigation bar
+import 'bookDetails.dart'; 
+import 'navigation.dart'; 
 
 class SearchPage extends StatefulWidget {
   final String query;
@@ -94,6 +94,24 @@ class _SearchPageState extends State<SearchPage> {
                                       book['authors']?.join(', ') ?? 'Unknown Author',
                                       style: const TextStyle(color: Colors.white70),
                                     ),
+                                    onTap: () {
+                                      // Navigate to BookDetailPage on tap
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => BookDetailPage(
+                                            title: book['title'] ?? 'No Title',
+                                            imageUrl: book['imageLinks']?['thumbnail'],
+                                            description: book['description'] ?? 'No Description',
+                                            author: book['authors']?.join(', ') ?? 'Unknown Author',
+                                            publishedDate: book['publishedDate'] ?? 'Unknown',
+                                            categories: book['categories']?.join(', ') ?? 'Unknown',
+                                            printType: book['printType'] ?? 'Unknown',
+                                            previewLink: book['previewLink'] ?? 'https://www.google.com',
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
                               ),

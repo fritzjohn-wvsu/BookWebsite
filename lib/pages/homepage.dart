@@ -16,22 +16,27 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
+    // Get the screen width and height using MediaQuery
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(
+              screenWidth * 0.01), // Adjust padding based on screen width
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               navigationBar(context), // Calling the navigation bar function
-              const SizedBox(height: 100), // Space between sections
+              SizedBox(height: screenHeight * 0.05), // Adjust space dynamically
               bodySection(), // Calling the body section function
-              const SizedBox(height: 200), // Space between sections
+              SizedBox(height: screenHeight * 0.2), // Adjust space dynamically
               popularBook(), // Calling the popular books section function
-              const SizedBox(height: 100),
+              SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
               updateList(),
-              const SizedBox(height: 100),
+              SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
               footerPage(),
             ],
           ),
