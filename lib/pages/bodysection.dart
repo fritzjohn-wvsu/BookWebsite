@@ -101,6 +101,17 @@ Widget bodySection() {
           ),
         ),
         // Right Section: Image
+        Align(
+        alignment: Alignment.topRight, // Adjust alignment to top-center
+        child: SizedBox(
+          width: 800, // Image width
+          height: 450, // Image height
+          child: Image.asset(
+            'assets/pic.png', // Replace with your image asset path
+            fit: BoxFit.cover, // Ensures the image fills the available space
+          ),
+        ),
+      ),
       ],
     ),
   );

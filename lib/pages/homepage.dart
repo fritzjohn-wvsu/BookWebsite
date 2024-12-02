@@ -22,9 +22,9 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(
-              screenWidth * 0.01), // Adjust padding based on screen width
+        // child: Padding(
+        //   padding: EdgeInsets.all(
+        //       screenWidth * 0.01), // Adjust padding based on screen width
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -34,11 +34,11 @@ class _HomepageState extends State<Homepage> {
               SizedBox(height: screenHeight * 0.2), // Adjust space dynamically
               popularBook(), // Calling the popular books section function
               SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
-              updateList(),
+              updateList(context),
               SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
               footerPage(),
             ],
-          ),
+          // ),
         ),
       ),
     );

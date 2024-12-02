@@ -55,7 +55,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(100), // Adjusted padding to 50
+        padding: const EdgeInsets.all(20), // Adjusted padding to 20 for better spacing
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -69,8 +69,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       color: Colors.white,
                       child: Image.network(
                         widget.imageUrl!,
-                        width: 200, // Adjusted width for better fitting
-                        height: 300, // Adjusted height for better fitting
+                        width: 150, // Adjusted width for better fitting
+                        height: 225, // Adjusted height for better fitting
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -91,9 +91,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 20,
-                      ), // Adjusted spacing
+                      SizedBox(height: 20), // Adjusted spacing
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Column(
@@ -124,8 +122,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Container(
                                 width: double.infinity,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                padding: const EdgeInsets.symmetric(vertical: 10.0),
                                 child: TextButton(
                                   onPressed: () {
                                     setState(() {

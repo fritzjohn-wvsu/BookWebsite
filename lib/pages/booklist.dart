@@ -5,7 +5,7 @@ import 'navigation.dart'; // Assuming this is a custom widget
 import 'bookDetails.dart'; // Assuming this is the BookDetailPage
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
+const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
 
 class BookListWidget extends StatefulWidget {
   @override
@@ -14,6 +14,9 @@ class BookListWidget extends StatefulWidget {
 
 class _BookListWidgetState extends State<BookListWidget> {
   List<dynamic> allBooks = [];
+  List<dynamic> filteredBooks = [];
+  String selectedGenre = 'All'; // Genre filter
+  String selectedOrder = 'A-Z'; // Sorting order
   bool isLoading = true;
 
   @override
@@ -36,26 +39,22 @@ class _BookListWidgetState extends State<BookListWidget> {
         }),
       );
 
+      // Check if the widget is still mounted before updating the state
       if (!mounted) return;
 
       setState(() {
+        // Combine the responses for both Fiction and Non-Fiction
         allBooks = [];
-
         for (var response in responses) {
           if (response.statusCode == 200) {
             final data = json.decode(response.body);
-            final items = data['items'] ?? [];
-
-            for (var item in items) {
-              allBooks.add(item);
-            }
+            allBooks.addAll(data['items'] ?? []);
           } else {
             debugPrint('Error fetching books: ${response.statusCode}');
           }
         }
-
-        // Initially sort the books by title A-Z after fetching
-        sortBooksAtoZ();
+        // Initially show all books
+        filteredBooks = List.from(allBooks);
         isLoading = false;
       });
     } catch (e) {
@@ -68,15 +67,29 @@ class _BookListWidgetState extends State<BookListWidget> {
     }
   }
 
-  // A-Z sorting by book title
-  void sortBooksAtoZ() {
-    allBooks.sort((a, b) {
-      final titleA = a['volumeInfo']['title'] ?? '';
-      final titleB = b['volumeInfo']['title'] ?? '';
-      return titleA.compareTo(titleB); // A-Z sorting by title
-    });
+  // Function to filter books based on genre and order
+  void filterBooks() {
+    List<dynamic> filtered = allBooks;
+
+    // Filter by genre
+    if (selectedGenre != 'All') {
+      filtered = filtered.where((book) {
+        final categories = book['volumeInfo']['categories'] ?? [];
+        return categories.contains(selectedGenre);
+      }).toList();
+    }
+
+    // Sort the books based on the selected order
+    if (selectedOrder == 'A-Z') {
+      filtered.sort((a, b) =>
+          a['volumeInfo']['title'].compareTo(b['volumeInfo']['title']));
+    } else if (selectedOrder == 'Z-A') {
+      filtered.sort((a, b) =>
+          b['volumeInfo']['title'].compareTo(a['volumeInfo']['title']));
+    }
+
     setState(() {
-      // Refresh the UI after sorting
+      filteredBooks = filtered;
     });
   }
 
@@ -219,28 +232,46 @@ class _BookListWidgetState extends State<BookListWidget> {
                             height: 20,
                           ),
                           const SizedBox(height: 25),
-                          // A-Z Sort Button
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: Center(
-                              child: ElevatedButton(
-                                onPressed: sortBooksAtoZ,
-                                style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 10.0, horizontal: 30.0),
-                                ),
-                                child: const Text(
-                                  'Sort A-Z',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                          Row(
+                            children: [
+                              // Genre Dropdown
+                              DropdownButton<String>(
+                                value: selectedGenre,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    selectedGenre = newValue!;
+                                  });
+                                  filterBooks();
+                                },
+                                items: ['All', 'Fiction', 'Non-Fiction']
+                                    .map((genre) {
+                                  return DropdownMenuItem<String>(
+                                    value: genre,
+                                    child: Text(genre),
+                                  );
+                                }).toList(),
                               ),
-                            ),
+                              const SizedBox(width: 20),
+                              // Order Dropdown
+                              DropdownButton<String>(
+                                value: selectedOrder,
+                                onChanged: (newValue) {
+                                  setState(() {
+                                    selectedOrder = newValue!;
+                                  });
+                                  filterBooks();
+                                },
+                                items: ['A-Z', 'Z-A'].map((order) {
+                                  return DropdownMenuItem<String>(
+                                    value: order,
+                                    child: Text(order),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 25),
-                          _buildBookGrid(allBooks), // Display sorted books
+                          _buildBookGrid(filteredBooks),
                         ],
                       ),
                     ),
