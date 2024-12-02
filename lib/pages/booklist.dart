@@ -5,7 +5,7 @@ import 'bookDetails.dart'; // Assuming this is the BookDetailPage
 import 'navigation.dart'; // Assuming this is a custom widget for navigation
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
+const String googleBooksApiKey = 'AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q';
 
 class BookListWidget extends StatefulWidget {
   @override
@@ -324,7 +324,7 @@ class _BookListWidgetState extends State<BookListWidget> {
                                       dropdownColor: Color(0xFF333333),
                                       underline: Container(
                                         height: 1,
-                                        color: Colors.black,
+                                        color: const Color.fromARGB(255, 0, 15, 22),
                                       ),
                                     ),
                                   ),
@@ -372,7 +372,7 @@ class _BookListWidgetState extends State<BookListWidget> {
                                       dropdownColor: Color(0xFF333333),
                                       underline: Container(
                                         height: 1,
-                                        color: Colors.black,
+                                        color: const Color.fromARGB(255, 0, 15, 22),
                                       ),
                                     ),
                                   ),

@@ -34,9 +34,9 @@ class _HomepageState extends State<Homepage> {
               SizedBox(height: screenHeight * 0.2), // Adjust space dynamically
               popularBook(), // Calling the popular books section function
               SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
-              updateList(),
+              updateList(context),
               SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
-              footerPage(),
+              FooterPage(),
             ],
           ),
         ),

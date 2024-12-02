@@ -1,150 +1,107 @@
 import 'package:flutter/material.dart';
+import 'package:main/pages/homepage.dart';
+import 'booklist.dart';
+import 'about.dart';
+import 'search.dart';
+import 'package:main/pages/route_manager.dart';
 
-class footerPage extends StatelessWidget {
-  const footerPage({super.key});
+class FooterPage extends StatelessWidget {
+  const FooterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      color: const Color(0xffe3eed4), // Footer background color changed
-      child: Column(
-        children: [
-          // Row for Navbar with Links (Home, About, Books)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+    // Helper function to style active and inactive links
+    Widget buildNavItem(String title, String routeName, Widget destination) {
+      bool isActive = RouteManager.currentRoute.value == routeName;
+      return TextButton(
+        onPressed: () {
+          // Update the current route in RouteManager
+          RouteManager.currentRoute.value = routeName;
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          );
+        },
+        child: Text(
+          title,
+          style: TextStyle(
+            color: isActive ? const Color(0xff0c1f25) : const Color(0xff7a7a7a),
+            fontSize: 14,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      );
+    }
+
+    return ValueListenableBuilder<String>(
+      valueListenable: RouteManager.currentRoute,
+      builder: (context, currentRoute, child) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          color: const Color(0xffe3eed4), // Footer background color
+          child: Column(
             children: [
-              TextButton(
-                onPressed: () {
-                  // Navigate to Home
-                },
-                child: const Text(
-                  "Home",
-                  style: TextStyle(
-                    color: Color(0xff0c1f25), // Text color changed
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+              // Logo and Text Button positioned on the left and centered
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start, // Aligns to the left
+                crossAxisAlignment: CrossAxisAlignment.center, // Vertically centers
+                children: [
+                  Image.asset(
+                    'assets/icon2.png',
+                    width: 35,
+                    height: 35,
+                    fit: BoxFit.contain,
                   ),
-                ),
-              ),
-              const SizedBox(width: 20),
-              TextButton(
-                onPressed: () {
-                  // Navigate to About
-                },
-                child: const Text(
-                  "About",
-                  style: TextStyle(
-                    color: Color(0xff0c1f25), // Text color changed
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      RouteManager.currentRoute.value = '/';
+                      Navigator.pushNamed(context, '/');
+                    },
+                    child: const Text(
+                      'LITFinds',
+                      style: TextStyle(
+                        color:Color(0xff0c1f25),
+                        fontFamily: "TanMerigue",
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: 20),
-              TextButton(
-                onPressed: () {
-                  // Navigate to Books
-                },
-                child: const Text(
-                  "Books",
-                  style: TextStyle(
-                    color: Color(0xff0c1f25), // Text color changed
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              
+
+              // Navbar with Links (Home, About, Books)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  buildNavItem("Home", '/home', const Homepage()),
+                  const SizedBox(width: 20),
+                  buildNavItem("About", '/about', const About()),
+                  const SizedBox(width: 20),
+                  buildNavItem("Books", '/books', BookListWidget()),
+                ],
               ),
+              const SizedBox(height: 20),
+
+
+              // Centered copyright text
+              // const Text(
+              //   "© 2024, 3N1. All rights reserved.",
+              //   style: TextStyle(
+              //     color: Color(0xff0c1f25),
+              //     fontSize: 14,
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              //   textAlign: TextAlign.center,
+              // ),
+              // const SizedBox(height: 10),
             ],
           ),
-          const SizedBox(height: 20),
-
-          // Row for Email Subscription and Copyright Notice
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Left side: Email subscription container
-              Container(
-                width: 500,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 0, 15,
-                      22), // Dark color for the email subscription container
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    // Text for Email Subscription
-                    const Expanded(
-                      child: Text(
-                        "Subscribe to our newsletter:",
-                        style: TextStyle(
-                          color: Color(0xffe3eed4), // Text color changed
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    // Email input field
-                    SizedBox(
-                      width: 200,
-                      child: TextField(
-                        style: const TextStyle(
-                          color:
-                              Colors.white, // Change input text color to white
-                        ),
-                        decoration: InputDecoration(
-                          hintText: "Enter your email",
-                          hintStyle: const TextStyle(
-                            color: Color(
-                                0xffe3eed4), // Hint text color changed to light color
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color(
-                                  0xffe3eed4), // Border color when enabled
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Color(
-                                  0xffe3eed4), // Border color when focused
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Subscribe Button
-                    IconButton(
-                      onPressed: () {
-                        // Handle subscription action
-                      },
-                      icon: const Icon(
-                        Icons.send,
-                        color: Color(0xffe3eed4), // Icon color changed
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Right side: All rights reserved text
-              const Text(
-                "© 2024, 3N1. All rights reserved.",
-                style: TextStyle(
-                  color: Color(0xff0c1f25), // Text color changed to dark color
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-        ],
-      ),
+        );
+      },
     );
   }
 }

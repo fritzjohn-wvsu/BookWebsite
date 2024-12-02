@@ -1,33 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:main/pages/homepage.dart';
 import 'booklist.dart';
+import 'about.dart';
+import 'search.dart'; // Import the Search page
+import 'package:main/pages/route_manager.dart';
+
 
 Widget navigationBar(BuildContext context) {
+  final TextEditingController searchController = TextEditingController();
+
+  // Function to style the nav item with active state
+  Widget buildNavItem(String title, String routeName) {
+    return ValueListenableBuilder<String>(
+      valueListenable: RouteManager.currentRoute,
+      builder: (context, currentRoute, child) {
+        bool isActive = currentRoute == routeName;
+        return TextButton(
+          onPressed: () {
+            RouteManager.currentRoute.value = routeName;
+            Navigator.pushNamed(context, routeName);
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: isActive ? const Color(0xffe3eed4) : Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(5),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: isActive
+                  ? const Color.fromARGB(255, 0, 15, 22)
+                  : const Color(0xffe3eed4),
+              fontSize: 15,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   return Container(
-    color: const Color.fromARGB(255, 0, 15, 22), // Set background color here
-    padding: const EdgeInsets.symmetric(
-        vertical: 15, horizontal: 20), // Padding for better spacing
+    color: const Color.fromARGB(255, 0, 15, 22),
+    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        // Left side content: Logo and LITFinds text
+      children: [
+        // Logo and LITFinds
         Row(
           children: [
             Image.asset(
-              'assets/icon.png', // Path to your icon
-              width: 40,
-              height: 40,
+              'assets/icon1.png',
+              width: 35,
+              height: 35,
               fit: BoxFit.contain,
             ),
             const SizedBox(width: 8),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                RouteManager.currentRoute.value = '/';
+                Navigator.pushNamed(context, '/');
+              },
               child: const Text(
                 'LITFinds',
                 style: TextStyle(
                   color: Color(0xffe3eed4),
-                  fontFamily:
-                      "TanMerigue", // Ensure this font exists or choose another
+                  fontFamily: "TanMerigue",
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -35,52 +75,25 @@ Widget navigationBar(BuildContext context) {
             ),
           ],
         ),
-        // Middle content: Home, About, Books
+        // Nav items
         Row(
           children: [
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Homepage()),
-                ); // Add your navigation for Home page
-              },
-              child: const Text(
-                'Home',
-                style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // Add your navigation for About page
-              },
-              child: const Text(
-                'About',
-                style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => BookListWidget()),
-                );
-              },
-              child: const Text(
-                'Books',
-                style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
-              ),
-            ),
+            buildNavItem('Home', '/home'),
+            const SizedBox(width: 30),
+            buildNavItem('About', '/about'),
+            const SizedBox(width: 30),
+            buildNavItem('Books', '/books'),
           ],
         ),
-        // Right side content: Search bar and user icon
-        Row(
+        // Search bar and user icon
+         Row(
           children: [
-            // Search bar integrated directly within the navigation bar
+            // Search bar
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              width: 250, // Adjust width to fit the screen
+              width: 250,
               child: TextField(
+                controller: searchController,
                 decoration: InputDecoration(
                   hintText: 'Search...',
                   border: OutlineInputBorder(
@@ -93,7 +106,27 @@ Widget navigationBar(BuildContext context) {
                     horizontal: 16.0,
                     vertical: 12.0,
                   ),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.search, color: Color.fromARGB(255, 0, 15, 22)),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchPage(query: searchController.text),
+                        ),
+                      );
+                    },
+                  ),
                 ),
+                // Add the onSubmitted callback to trigger search on Enter
+                onSubmitted: (query) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(query: query),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 20),

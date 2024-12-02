@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 Widget bodySection() {
-  return Padding(
-    padding: const EdgeInsets.all(20), // Padding around the entire section
-    child: Row(
+  return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -14,6 +12,7 @@ Widget bodySection() {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Main heading
+              SizedBox(height: 70,),
               const Text(
                 "Discover Your Next Favorite",
                 style: TextStyle(
@@ -101,7 +100,17 @@ Widget bodySection() {
           ),
         ),
         // Right Section: Image
+        Align(
+        alignment: Alignment.topRight, // Adjust alignment to top-center
+        child: SizedBox(
+          width: 800, // Image width
+          height: 450, // Image height
+          child: Image.asset(
+            'assets/pic.png', // Replace with your image asset path
+            fit: BoxFit.cover, // Ensures the image fills the available space
+          ),
+        ),
+      ),
       ],
-    ),
-  );
+    );
 }
