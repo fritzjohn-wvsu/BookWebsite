@@ -111,6 +111,15 @@ Widget navigationBar(BuildContext context) {
                     },
                   ),
                 ),
+                // Add the onSubmitted callback to trigger search on Enter
+                onSubmitted: (query) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchPage(query: query),
+                    ),
+                  );
+                },
               ),
             ),
             const SizedBox(width: 20),

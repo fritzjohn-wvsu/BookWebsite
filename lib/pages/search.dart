@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bookDetails.dart'; 
-import 'navigation.dart'; 
+import 'bookDetails.dart';
+import 'navigation.dart';
+import 'bg.dart';
 
 class SearchPage extends StatefulWidget {
   final String query;
@@ -26,7 +27,8 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Future<void> fetchBooks(String query) async {
-    final url = Uri.parse('https://www.googleapis.com/books/v1/volumes?q=$query');
+    final url = Uri.parse(
+        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -43,30 +45,31 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 0, 15, 22), // Background set to black
+      backgroundColor: const Color.fromARGB(255, 0, 15, 22), // Background set to black
       body: Stack(
         children: [
-          // Dropdown positioned on the right side of the screen, below the navigation bar
+          Positioned.fill(
+            child: BackgroundPage(), 
+          ),
           if (showDropdown)
             Positioned(
-              top: kToolbarHeight + 20, // Added padding below the navigation bar
+              top: kToolbarHeight + 20, // Padding below the navigation bar
               right: 0,
-              width: MediaQuery.of(context).size.width / 2, // Take half the screen width
+              width: MediaQuery.of(context).size.width / 2,
               child: Material(
-                color: Colors.transparent, // Make sure the background is transparent
+                color: Colors.transparent,
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.black87,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.all(10), // Consistent padding inside the dropdown
+                    padding: const EdgeInsets.all(10),
                     child: SingleChildScrollView(
                       child: SizedBox(
-                        height: MediaQuery.of(context).size.height / 2, // Limit height
+                        height: MediaQuery.of(context).size.height / 2,
                         child: Column(
                           children: [
-                            // Text that says "Search result for [query]"
                             Padding(
                               padding: const EdgeInsets.all(10),
                               child: Text(
@@ -78,7 +81,6 @@ class _SearchPageState extends State<SearchPage> {
                                 ),
                               ),
                             ),
-                            // Results list
                             Expanded(
                               child: ListView.builder(
                                 shrinkWrap: true,
@@ -95,7 +97,6 @@ class _SearchPageState extends State<SearchPage> {
                                       style: const TextStyle(color: Colors.white70),
                                     ),
                                     onTap: () {
-                                      // Navigate to BookDetailPage on tap
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -124,13 +125,11 @@ class _SearchPageState extends State<SearchPage> {
                 ),
               ),
             ),
-
-          // Include the navigation bar at the top of the screen
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            child: navigationBar(context), // Include your navigation bar widget
+            child: navigationBar(context),
           ),
         ],
       ),
