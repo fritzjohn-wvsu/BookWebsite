@@ -5,7 +5,6 @@ import 'about.dart';
 import 'search.dart'; // Import the Search page
 import 'package:main/pages/route_manager.dart';
 
-
 Widget navigationBar(BuildContext context) {
   final TextEditingController searchController = TextEditingController();
 
@@ -23,9 +22,9 @@ Widget navigationBar(BuildContext context) {
           style: TextButton.styleFrom(
             backgroundColor: isActive ? const Color(0xffe3eed4) : Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(24),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           ),
           child: Text(
             title,
@@ -45,107 +44,92 @@ Widget navigationBar(BuildContext context) {
   return Container(
     color: const Color.fromARGB(255, 0, 15, 22),
     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Logo and LITFinds
-        Row(
-          children: [
-            Image.asset(
-              'assets/icon1.png',
-              width: 35,
-              height: 35,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(width: 8),
-            TextButton(
-              onPressed: () {
-                RouteManager.currentRoute.value = '/';
-                Navigator.pushNamed(context, '/');
-              },
-              child: const Text(
-                'LITFinds',
-                style: TextStyle(
-                  color: Color(0xffe3eed4),
-                  fontFamily: "TanMerigue",
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+    child: Padding(
+      padding: const EdgeInsets.only(left: 60, right: 60), // Add padding to left and right
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Keep logo and search bar on the ends
+        children: [
+          // Logo and LITFinds
+          Row(
+            children: [
+              Image.asset(
+                'assets/icon1.png',
+                width: 50,
+                height: 50,
+                fit: BoxFit.contain,
               ),
-            ),
-          ],
-        ),
-        // Nav items
-        Row(
-          children: [
-            buildNavItem('Home', '/home'),
-            const SizedBox(width: 30),
-            buildNavItem('About', '/about'),
-            const SizedBox(width: 30),
-            buildNavItem('Books', '/books'),
-          ],
-        ),
-        // Search bar and user icon
-         Row(
-          children: [
-            // Search bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16.0),
-              width: 250,
-              child: TextField(
-                controller: searchController,
-                decoration: InputDecoration(
-                  hintText: 'Search...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: BorderSide.none,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 12.0,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search, color: Color.fromARGB(255, 0, 15, 22)),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SearchPage(query: searchController.text),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                // Add the onSubmitted callback to trigger search on Enter
-                onSubmitted: (query) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SearchPage(query: query),
-                    ),
-                  );
+              TextButton(
+                onPressed: () {
+                  RouteManager.currentRoute.value = '/home'; // Set to home route
+                  Navigator.pushNamed(context, '/home'); // Navigate to home
                 },
+                child: const Text(
+                  'LITFinds',
+                  style: TextStyle(
+                    color: Color(0xffe3eed4),
+                    fontFamily: "TanMerigue",
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
+            ],
+          ),
+          // Centered nav items (Home, About, Books)
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center, // Center the nav items
+              children: [
+                buildNavItem('Home', '/home'),
+                const SizedBox(width: 30),
+                buildNavItem('About', '/about'),
+                const SizedBox(width: 30),
+                buildNavItem('Books', '/books'),
+              ],
             ),
-            const SizedBox(width: 20),
-            // User icon
-            Container(
-              padding: const EdgeInsets.all(5),
-              decoration: const BoxDecoration(
-                color: Color(0xffe3eed4),
-                shape: BoxShape.circle,
+          ),
+          // Search bar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            width: 250,
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Color(0xffe3eed4),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 12.0,
+                ),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.search, color: Color.fromARGB(255, 0, 15, 22)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchPage(query: searchController.text),
+                      ),
+                    );
+                  },
+                ),
               ),
-              child: const Icon(
-                Icons.person,
-                color: Color.fromARGB(255, 0, 15, 22),
-                size: 25,
-              ),
+              onSubmitted: (query) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchPage(query: query),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     ),
   );
 }

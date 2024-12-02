@@ -53,6 +53,16 @@ class _AboutState extends State<About> {
                 ),
               ),
             ),
+            const Text(
+                "© 2024, 3N1. All rights reserved.",
+                style: TextStyle(
+                  color: Color(0xffe3eed4),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
             // Footer section
             FooterPage(),
           ],
@@ -88,7 +98,7 @@ class _AboutState extends State<About> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
           Text(
-            'LitFinds',
+            'LITFinds',
             style: TextStyle(
               color: Color(0xffe3eed4),
               fontSize: 40,
@@ -98,9 +108,9 @@ class _AboutState extends State<About> {
           ),
           SizedBox(height: 20),
           Text(
-            'LitFinds is a web-based book recommendation application that '
+            'LITFinds is a web-based book recommendation application that '
             'allows users to explore and uncover books across a wide range of genres. '
-            'Whether you love mysteries, thrillers, or romantic tales, LitFinds has the perfect recommendation waiting for you.',
+            'Whether you love mysteries, thrillers, or romantic tales, LITFinds has the perfect recommendation waiting for you.',
             style: TextStyle(
               color: const Color(0xffe3eed4),
               fontSize: 20,

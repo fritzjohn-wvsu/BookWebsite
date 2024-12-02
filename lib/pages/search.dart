@@ -27,7 +27,7 @@ class _SearchPageState extends State<SearchPage> {
 
   Future<void> fetchBooks(String query) async {
     final url = Uri.parse(
-        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q');
+        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -129,9 +129,9 @@ class _SearchPageState extends State<SearchPage> {
                         style: ElevatedButton.styleFrom(
                           foregroundColor: const Color.fromARGB(255, 0, 15, 22), // Button background color
                           backgroundColor: const Color(0xffe3eed4), // Button text color
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8), // Rounded corners
+                            borderRadius: BorderRadius.circular(24), // Rounded corners
                           ),
                         ),
                         onPressed: () {

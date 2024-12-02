@@ -4,6 +4,7 @@ import 'booklist.dart';
 import 'about.dart';
 import 'search.dart';
 import 'package:main/pages/route_manager.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart'; // Import Font Awesome package
 
 class FooterPage extends StatelessWidget {
   const FooterPage({super.key});
@@ -40,65 +41,94 @@ class FooterPage extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(16),
           color: const Color(0xffe3eed4), // Footer background color
-          child: Column(
-            children: [
-              // Logo and Text Button positioned on the left and centered
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start, // Aligns to the left
-                crossAxisAlignment: CrossAxisAlignment.center, // Vertically centers
-                children: [
-                  Image.asset(
-                    'assets/icon2.png',
-                    width: 35,
-                    height: 35,
-                    fit: BoxFit.contain,
-                  ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      RouteManager.currentRoute.value = '/';
-                      Navigator.pushNamed(context, '/');
-                    },
-                    child: const Text(
-                      'LITFinds',
-                      style: TextStyle(
-                        color:Color(0xff0c1f25),
-                        fontFamily: "TanMerigue",
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 100, right: 100), // Add left and right padding
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Space between elements
+              crossAxisAlignment: CrossAxisAlignment.center, // Vertically center items
+              children: [
+                // Logo and Text Button on the left
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/icon2.png',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        RouteManager.currentRoute.value = '/home'; // Set to home route
+                        Navigator.pushNamed(context, '/home'); // Navigate to home
+                      },
+                      child: const Text(
+                        'LITFinds',
+                        style: TextStyle(
+                          color: Color(0xff0c1f25),
+                          fontFamily: "TanMerigue",
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              
+                  ],
+                ),
+                
+                // Navbar with Links (Home, About, Books)
+                Row(
+                  children: [
+                    buildNavItem("Home", '/home', const Homepage()),
+                    const SizedBox(width: 20),
+                    buildNavItem("About", '/about', const About()),
+                    const SizedBox(width: 20),
+                    buildNavItem("Books", '/books', BookListWidget()),
+                  ],
+                ),
 
-              // Navbar with Links (Home, About, Books)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  buildNavItem("Home", '/home', const Homepage()),
-                  const SizedBox(width: 20),
-                  buildNavItem("About", '/about', const About()),
-                  const SizedBox(width: 20),
-                  buildNavItem("Books", '/books', BookListWidget()),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-
-              // Centered copyright text
-              // const Text(
-              //   "© 2024, 3N1. All rights reserved.",
-              //   style: TextStyle(
-              //     color: Color(0xff0c1f25),
-              //     fontSize: 14,
-              //     fontWeight: FontWeight.bold,
-              //   ),
-              //   textAlign: TextAlign.center,
-              // ),
-              // const SizedBox(height: 10),
-            ],
+                // Social Media Icons on the right
+                Row(
+                  children: [
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.facebook,
+                        color: const Color.fromARGB(255, 0, 15, 22), // Set color here
+                      ),
+                      onPressed: () {
+                        // Add your Facebook link here
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.twitter,
+                        color: const Color.fromARGB(255, 0, 15, 22), // Set color here
+                      ),
+                      onPressed: () {
+                        // Add your Twitter link here
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.pinterest,
+                        color: const Color.fromARGB(255, 0, 15, 22), // Set color here
+                      ),
+                      onPressed: () {
+                        // Add your Pinterest link here
+                      },
+                    ),
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.instagram,
+                        color: const Color.fromARGB(255, 0, 15, 22), // Set color here
+                      ),
+                      onPressed: () {
+                        // Add your Instagram link here
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

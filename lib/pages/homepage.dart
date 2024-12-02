@@ -22,9 +22,7 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.all(
-              screenWidth * 0.01), // Adjust padding based on screen width
+        
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -39,7 +37,6 @@ class _HomepageState extends State<Homepage> {
               FooterPage(),
             ],
           ),
-        ),
       ),
     );
   }

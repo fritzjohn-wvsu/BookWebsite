@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'bookDetails.dart'; // Assuming this is the BookDetailPage
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q';
+const String googleBooksApiKey = 'AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0';
 
 Future<List<dynamic>> fetchBooks() async {
   final urls = [
@@ -191,7 +191,7 @@ Widget updateList(BuildContext context) {
 
       return SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

@@ -5,7 +5,7 @@ import 'dart:math'; // For randomizing the list
 import 'bookDetails.dart'; // Import the BookDetailPage
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q';
+const String googleBooksApiKey = 'AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0';
 
 // Fetch books from Google Books API
 Future<List<dynamic>> fetchBooks() async {

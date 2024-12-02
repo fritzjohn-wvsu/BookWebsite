@@ -5,7 +5,7 @@ import 'bookDetails.dart'; // Assuming this is the BookDetailPage
 import 'navigation.dart'; // Assuming this is a custom widget for navigation
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q';
+const String googleBooksApiKey = 'AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0';
 
 class BookListWidget extends StatefulWidget {
   @override
@@ -14,20 +14,31 @@ class BookListWidget extends StatefulWidget {
 
 class _BookListWidgetState extends State<BookListWidget> {
   List<dynamic> allBooks = []; // To store books from all genres
-  List<dynamic> filteredBooks = []; // Books filtered by search
+  List<dynamic> filteredBooks = []; // Books filtered by search and genre
   bool isLoading = true;
   String _selectedSort = 'A-Z'; // Default sort option
   String _selectedGenre = 'All'; // Default genre (All books)
   TextEditingController _searchController = TextEditingController();
 
   // Genres to filter by
-  final List<String> availableGenres = [
-    'All', // Option to show all genres
-    'Fiction',
-    'Non-Fiction',
-    'Fantasy',
-    'Action'
-  ];
+ final List<String> availableGenres = [
+  'All', // Option to show all genres
+  'Fiction',
+  'Fantasy',
+  'Action',
+  'Poetry', // Added Poetry genre
+  'Art', // Added Art genre
+  'Education', // Added Education genre
+  'History', // Added History genre
+  'Law', // Added Law genre
+  'Nature', // Added Nature genre
+  'Photography', // Added Photography genre
+  'Psychology', // Added Psychology genre
+  'Mathematics', // Added Mathematics genre
+  'Cooking', // Added Cooking genre
+  'Travel',
+];
+
 
   @override
   void initState() {
@@ -35,74 +46,72 @@ class _BookListWidgetState extends State<BookListWidget> {
     fetchBooks(); // Fetch all books initially
   }
 
-  // Fetch books for all genres concurrently
-  Future<void> fetchBooks() async {
-    try {
-      final genres = ['Fiction', 'Non-Fiction', 'Fantasy', 'Action'];
+  // Fetch books based on the selected genre
+Future<void> fetchBooks() async {
+  try {
+    final genres = _selectedGenre == 'All'
+        ? [
+            'Fiction', 'Fantasy', 'Action', 'Poetry',
+            'Art', 'Education', 'History', 'Law', 'Nature',
+            'Photography', 'Psychology', 'Mathematics', 'Cooking', 'Travel'
+          ] 
+        : [_selectedGenre]; // Fetch only the selected genre
 
-      // Creating a list of Future requests for each genre
-      final List<Future<http.Response>> requests = genres.map((genre) {
-        final url =
-            'https://www.googleapis.com/books/v1/volumes?q=subject:$genre&maxResults=5&key=$googleBooksApiKey';
-        return http.get(Uri.parse(url));
-      }).toList();
+    final List<Future<http.Response>> requests = genres.map((genre) {
+      final url =
+          'https://www.googleapis.com/books/v1/volumes?q=subject:$genre&maxResults=5&key=$googleBooksApiKey';
+      return http.get(Uri.parse(url));
+    }).toList();
 
-      // Wait for all requests to complete
-      final responses = await Future.wait(requests);
+    final responses = await Future.wait(requests);
 
-      // Collect all books from the responses
-      List<dynamic> books = [];
-      for (var response in responses) {
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          books.addAll(data['items'] ?? []); // Add books to the list
-        } else {
-          debugPrint('Error fetching books: ${response.statusCode}');
-        }
+    List<dynamic> books = [];
+    for (var response in responses) {
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        books.addAll(data['items'] ?? []);
+      } else {
+        debugPrint('Error fetching books: ${response.statusCode}');
       }
-
-      setState(() {
-        allBooks = books; // Store the fetched books
-        filteredBooks = books; // Set the initial filtered books to all books
-        // Apply sorting after books are fetched
-        sortBooks();
-
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      debugPrint('Error fetching books: $e');
     }
-  }
 
-  // Sorting logic based on selected dropdown option (A-Z or Z-A)
+    setState(() {
+      allBooks = books;
+      filteredBooks = books;
+      sortBooks();
+      isLoading = false;
+    });
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+    debugPrint('Error fetching books: $e');
+  }
+}
+
+
+
   void sortBooks() {
     if (_selectedSort == 'A-Z') {
-      // Sort books alphabetically by title (A-Z)
       filteredBooks.sort((a, b) {
         final titleA = a['volumeInfo']['title'] ?? '';
         final titleB = b['volumeInfo']['title'] ?? '';
-        return titleA.compareTo(titleB); // A-Z sorting by title
+        return titleA.compareTo(titleB);
       });
     } else if (_selectedSort == 'Z-A') {
-      // Sort books in reverse alphabetical order (Z-A)
       filteredBooks.sort((a, b) {
         final titleA = a['volumeInfo']['title'] ?? '';
         final titleB = b['volumeInfo']['title'] ?? '';
-        return titleB.compareTo(titleA); // Z-A sorting by title
+        return titleB.compareTo(titleA);
       });
     }
-
-    setState(() {}); // Rebuild UI after sorting
+    setState(() {});
   }
 
-  // Function to filter books based on the search query
   void filterBooks(String query) {
     if (query.isEmpty) {
       setState(() {
-        filteredBooks = allBooks; // Show all books if search is empty
+        filteredBooks = allBooks;
       });
     } else {
       setState(() {
@@ -117,7 +126,6 @@ class _BookListWidgetState extends State<BookListWidget> {
     }
   }
 
-  // Widget to display each book in a rectangular card
   Widget _bookRectangle(
       String bookName,
       String? imageUrl,
@@ -147,7 +155,6 @@ class _BookListWidgetState extends State<BookListWidget> {
       },
       child: Column(
         children: [
-          // Book Image
           Container(
             width: 200,
             height: 300,
@@ -162,7 +169,6 @@ class _BookListWidgetState extends State<BookListWidget> {
             ),
           ),
           const SizedBox(height: 8),
-          // Book Title
           SizedBox(
             width: 200,
             child: Text(
@@ -183,16 +189,15 @@ class _BookListWidgetState extends State<BookListWidget> {
     );
   }
 
-  // Widget to display books in a grid
   Widget _buildBookGrid(List<dynamic> bookList) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5, // 5 items per row
-        crossAxisSpacing: 20.0, // Horizontal space
-        mainAxisSpacing: 10.0, // Vertical space
-        childAspectRatio: 200 / 300, // Width to height ratio
+        crossAxisCount: 5,
+        crossAxisSpacing: 20.0,
+        mainAxisSpacing: 10.0,
+        childAspectRatio: 200 / 300,
       ),
       itemCount: bookList.length,
       itemBuilder: (context, index) {
@@ -239,7 +244,7 @@ class _BookListWidgetState extends State<BookListWidget> {
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(40.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -257,131 +262,137 @@ class _BookListWidgetState extends State<BookListWidget> {
                             height: 20,
                           ),
                           const SizedBox(height: 25),
-                          // Search Bar with inset of 30
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 30),
+                            padding: const EdgeInsets.only(bottom: 16.0),
                             child: TextField(
                               controller: _searchController,
                               onChanged: filterBooks,
                               decoration: InputDecoration(
                                 hintText: 'Search by title or author...',
-                                hintStyle: TextStyle(color: Colors.white),
-                                filled: true,
-                                fillColor: Color(0xFF333333),
-                                contentPadding: EdgeInsets.all(16),
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: BorderRadius.circular(10),
+                                hintStyle: const TextStyle(
+                                  color: Color(0xffe3eed4),
+                                  fontSize: 14,
                                 ),
-                                prefixIcon:
-                                    Icon(Icons.search, color: Colors.white),
+                                contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                filled: true,
+                                fillColor: const Color(0xff293d3e),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(
+                                    Icons.search,
+                                    color: Color(0xffe3eed4),
+                                  ),
+                                  onPressed: () {},
+                                ),
                               ),
-                              style: TextStyle(color: Colors.white),
                             ),
                           ),
-                          const SizedBox(height: 25),
-                          // Sort Dropdowns in a Row
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // A-Z Sort Dropdown
-                              Container(
-                                width: 200,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.white,
-                                      width: 1), // White border
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      8.0), // Add padding inside the container
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(maxWidth: 100),
+                          const SizedBox(height: 5),
+                          // Combined Row for Genre and Sort Dropdowns, Centered
+                          Center(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Sort Dropdown (now first)
+                                Container(
+                                  width: 150, // Adjusted width for the container
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff293d3e),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0), // Padding for alignment
                                     child: DropdownButton<String>(
-                                      value: _selectedSort,
-                                      isExpanded: true,
-                                      items: ['A-Z', 'Z-A']
-                                          .map((String value) =>
-                                              DropdownMenuItem<String>(
+                                      value: _selectedSort, // Using the sort dropdown as an example
+                                      dropdownColor: const Color(0xff293d3e),
+                                      borderRadius: BorderRadius.circular(24),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          _selectedSort = newValue!;
+                                          sortBooks();
+                                        });
+                                      },
+                                      items: <String>[
+                                        'A-Z',
+                                        'Z-A',
+                                      ].map<DropdownMenuItem<String>>((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: Text(
+                                            value,
+                                            style: const TextStyle(color: Color(0xffe3eed4)),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      icon: const Icon(
+                                        Icons.arrow_drop_down,
+                                        color: Color(0xffe3eed4),
+                                      ), // Positioned to the right by default
+                                      isExpanded: true, // Ensures the icon stays aligned
+                                      underline: Container(
+                                        height: 1, // Adjust the height of the underline
+                                        color: const Color(0xff293d3e), // Replace with your desired color
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const SizedBox(width: 50),
+                                // Genre Dropdown (now second)
+                                Container(
+                                  width: 150, // Reduced width for Genre
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xff293d3e),
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0), // Padding inside
+                                    child: DropdownButton<String>(
+                                      value: _selectedGenre,
+                                      dropdownColor: const Color(0xff293d3e),
+                                      borderRadius: BorderRadius.circular(24),
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          _selectedGenre = newValue!;
+                                          fetchBooks();
+                                        });
+                                      },
+                                      items: availableGenres
+                                          .map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                              return DropdownMenuItem<String>(
                                                 value: value,
                                                 child: Text(
                                                   value,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                  style: const TextStyle(
+                                                      color: Color(0xffe3eed4)),
                                                 ),
-                                              ))
+                                              );
+                                            },
+                                          )
                                           .toList(),
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          _selectedSort = newValue!;
-                                        });
-                                        sortBooks(); // Sort books after selecting option
-                                      },
-                                      style: TextStyle(color: Colors.white),
-                                      dropdownColor: Color(0xFF333333),
-                                      underline: Container(
-                                        height: 1,
-                                        color: const Color.fromARGB(255, 0, 15, 22),
-                                      ),
+                                          icon: const Icon(
+                                            Icons.arrow_drop_down,
+                                            color: Color(0xffe3eed4),
+                                          ), // Positioned to the right by default
+                                          isExpanded: true, // Ensures the icon stays aligned
+                                          underline: Container(
+                                            height: 1, // Adjust the height of the underline
+                                            color: const Color(0xff293d3e), // Replace with your desired color
+                                          ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 50),
-                              // Genre Dropdown
-                              Container(
-                                width: 200,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.white,
-                                      width: 1), // White border
-                                  borderRadius: BorderRadius.circular(
-                                      8), // Rounded corners
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(
-                                      8.0), // Add padding inside the container
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(maxWidth: 100),
-                                    child: DropdownButton<String>(
-                                      value: _selectedGenre,
-                                      isExpanded: true,
-                                      items: availableGenres
-                                          .map((String genre) =>
-                                              DropdownMenuItem<String>(
-                                                value: genre,
-                                                child: Text(
-                                                  genre,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ))
-                                          .toList(),
-                                      onChanged: (newGenre) {
-                                        setState(() {
-                                          _selectedGenre = newGenre!;
-                                          isLoading = true;
-                                        });
-                                        fetchBooks(); // Fetch books based on genre
-                                      },
-                                      style: TextStyle(color: Colors.white),
-                                      dropdownColor: Color(0xFF333333),
-                                      underline: Container(
-                                        height: 1,
-                                        color: const Color.fromARGB(255, 0, 15, 22),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(height: 25),
-                          // Display books in grid format
+                          const SizedBox(height: 30),
                           _buildBookGrid(filteredBooks),
                         ],
                       ),
