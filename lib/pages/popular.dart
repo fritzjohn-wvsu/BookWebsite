@@ -5,7 +5,7 @@ import 'dart:math'; // For randomizing the list
 import 'bookDetails.dart'; // Import the BookDetailPage
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0';
+const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';
 
 // Fetch books from Google Books API
 Future<List<dynamic>> fetchBooks() async {
@@ -21,7 +21,7 @@ Future<List<dynamic>> fetchBooks() async {
         return response;
       }),
     );
-
+//fetch the books
     List<dynamic> allBooks = [];
 
     for (var response in responses) {
@@ -94,7 +94,7 @@ Widget popularBook() {
                       mainAxisSpacing: 10.0,
                       childAspectRatio: 200 / 300,
                     ),
-                    itemCount: books.length,
+                    itemCount: books.length, // get all the description
                     itemBuilder: (context, index) {
                       final volumeInfo = books[index]['volumeInfo'];
                       final title = volumeInfo['title'] ?? 'Unknown Title';

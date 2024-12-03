@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bookDetails.dart'; // Assuming this is the BookDetailPage
-import 'navigation.dart'; // Assuming this is a custom widget for navigation
+import 'bookDetails.dart';
+import 'navigation.dart'; 
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0';
+const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';
 
 class BookListWidget extends StatefulWidget {
   @override
@@ -26,16 +26,16 @@ class _BookListWidgetState extends State<BookListWidget> {
   'Fiction',
   'Fantasy',
   'Action',
-  'Poetry', // Added Poetry genre
-  'Art', // Added Art genre
-  'Education', // Added Education genre
-  'History', // Added History genre
-  'Law', // Added Law genre
-  'Nature', // Added Nature genre
-  'Photography', // Added Photography genre
-  'Psychology', // Added Psychology genre
-  'Mathematics', // Added Mathematics genre
-  'Cooking', // Added Cooking genre
+  'Poetry', 
+  'Art',
+  'Education',
+  'History', 
+  'Law',
+  'Nature', 
+  'Photography', 
+  'Psychology', 
+  'Mathematics', 
+  'Cooking', 
   'Travel',
 ];
 
@@ -90,23 +90,40 @@ Future<void> fetchBooks() async {
 }
 
 
-
+//sort the books to a-z to z-a
   void sortBooks() {
-    if (_selectedSort == 'A-Z') {
-      filteredBooks.sort((a, b) {
-        final titleA = a['volumeInfo']['title'] ?? '';
-        final titleB = b['volumeInfo']['title'] ?? '';
-        return titleA.compareTo(titleB);
-      });
-    } else if (_selectedSort == 'Z-A') {
-      filteredBooks.sort((a, b) {
-        final titleA = a['volumeInfo']['title'] ?? '';
-        final titleB = b['volumeInfo']['title'] ?? '';
-        return titleB.compareTo(titleA);
-      });
-    }
-    setState(() {});
+  if (_selectedSort == 'A-Z') {
+    filteredBooks.sort((a, b) {
+      final titleA = a['volumeInfo']['title'] ?? '';
+      final titleB = b['volumeInfo']['title'] ?? '';
+      return titleA.compareTo(titleB);
+    });
+  } else if (_selectedSort == 'Z-A') {
+    filteredBooks.sort((a, b) {
+      final titleA = a['volumeInfo']['title'] ?? '';
+      final titleB = b['volumeInfo']['title'] ?? '';
+      return titleB.compareTo(titleA);
+    });
+  } else if (_selectedSort == 'Newest') {  //sort the books to newest to lowest
+    filteredBooks.sort((a, b) {
+      final dateA = DateTime.tryParse(a['volumeInfo']['publishedDate'] ?? '') ??
+          DateTime(1900);
+      final dateB = DateTime.tryParse(b['volumeInfo']['publishedDate'] ?? '') ??
+          DateTime(1900);
+      return dateB.compareTo(dateA);
+    });
+  } else if (_selectedSort == 'Oldest') {
+    filteredBooks.sort((a, b) {
+      final dateA = DateTime.tryParse(a['volumeInfo']['publishedDate'] ?? '') ??
+          DateTime(1900);
+      final dateB = DateTime.tryParse(b['volumeInfo']['publishedDate'] ?? '') ??
+          DateTime(1900);
+      return dateA.compareTo(dateB);
+    });
   }
+  setState(() {});
+}
+
 
   void filterBooks(String query) {
     if (query.isEmpty) {
@@ -199,7 +216,7 @@ Future<void> fetchBooks() async {
         mainAxisSpacing: 10.0,
         childAspectRatio: 200 / 300,
       ),
-      itemCount: bookList.length,
+      itemCount: bookList.length, // build the descriptions
       itemBuilder: (context, index) {
         final volumeInfo = bookList[index]['volumeInfo'];
         final title = volumeInfo['title'] ?? 'Unknown Title';
@@ -299,60 +316,57 @@ Future<void> fetchBooks() async {
                               children: [
                                 // Sort Dropdown (now first)
                                 Container(
-                                  width: 150, // Adjusted width for the container
+                                  width: 150,
                                   height: 50,
                                   decoration: BoxDecoration(
                                     color: const Color(0xff293d3e),
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14.0), // Padding for alignment
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0),
                                     child: DropdownButton<String>(
-                                      value: _selectedSort, // Using the sort dropdown as an example
-                                      dropdownColor: const Color(0xff293d3e),
-                                      borderRadius: BorderRadius.circular(24),
-                                      onChanged: (String? newValue) {
-                                        setState(() {
-                                          _selectedSort = newValue!;
-                                          sortBooks();
-                                        });
-                                      },
-                                      items: <String>[
-                                        'A-Z',
-                                        'Z-A',
-                                      ].map<DropdownMenuItem<String>>((String value) {
-                                        return DropdownMenuItem<String>(
-                                          value: value,
-                                          child: Text(
-                                            value,
-                                            style: const TextStyle(color: Color(0xffe3eed4)),
-                                          ),
-                                        );
-                                      }).toList(),
+                                  value: _selectedSort,
+                                  items: ['A-Z', 'Z-A', 'Newest', 'Oldest']
+                                      .map((sortOption) => DropdownMenuItem(
+                                            value: sortOption,
+                                            child: Text(
+                                              sortOption,
+                                              style: const TextStyle(color: Color(0xffe3eed4)),
+                                            ),
+                                          ))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _selectedSort = value!;
+                                      sortBooks(); // Re-sort the books when a new option is selected
+                                    });
+                                  },
+                                  dropdownColor: const Color(0xff1c2a36),
+                                  style: const TextStyle(color: Color(0xffe3eed4)),
+
                                       icon: const Icon(
                                         Icons.arrow_drop_down,
                                         color: Color(0xffe3eed4),
-                                      ), // Positioned to the right by default
-                                      isExpanded: true, // Ensures the icon stays aligned
+                                      ),
+                                      isExpanded: true,
                                       underline: Container(
-                                        height: 1, // Adjust the height of the underline
-                                        color: const Color(0xff293d3e), // Replace with your desired color
+                                        height: 1,
+                                        color: const Color(0xff293d3e),
                                       ),
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(width: 50),
                                 // Genre Dropdown (now second)
                                 Container(
-                                  width: 150, // Reduced width for Genre
+                                  width: 150, 
                                   height: 50,
                                   decoration: BoxDecoration(
                                     color: const Color(0xff293d3e),
                                     borderRadius: BorderRadius.circular(24),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14.0), // Padding inside
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0), 
                                     child: DropdownButton<String>(
                                       value: _selectedGenre,
                                       dropdownColor: const Color(0xff293d3e),
@@ -380,11 +394,11 @@ Future<void> fetchBooks() async {
                                           icon: const Icon(
                                             Icons.arrow_drop_down,
                                             color: Color(0xffe3eed4),
-                                          ), // Positioned to the right by default
-                                          isExpanded: true, // Ensures the icon stays aligned
+                                          ), 
+                                          isExpanded: true, 
                                           underline: Container(
-                                            height: 1, // Adjust the height of the underline
-                                            color: const Color(0xff293d3e), // Replace with your desired color
+                                            height: 1, 
+                                            color: const Color(0xff293d3e), 
                                           ),
                                     ),
                                   ),

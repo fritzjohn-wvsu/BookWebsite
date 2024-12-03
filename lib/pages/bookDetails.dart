@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // Import url_launcher
+import 'package:url_launcher/url_launcher.dart'; 
 
+//added the descriptions
 class BookDetailPage extends StatefulWidget {
   final String title;
   final String? imageUrl;
@@ -9,8 +10,9 @@ class BookDetailPage extends StatefulWidget {
   final String publishedDate;
   final String categories;
   final String printType;
-  final String previewLink; // Added preview link field
+  final String previewLink; 
 
+//added the parameter
   const BookDetailPage({
     Key? key,
     required this.title,
@@ -20,7 +22,7 @@ class BookDetailPage extends StatefulWidget {
     required this.publishedDate,
     required this.categories,
     required this.printType,
-    required this.previewLink, // Added preview link parameter
+    required this.previewLink, 
   }) : super(key: key);
 
   @override
@@ -55,7 +57,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(100), // Adjusted padding to 50
+        padding: const EdgeInsets.all(100), 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -69,8 +71,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       color: Colors.white,
                       child: Image.network(
                         widget.imageUrl!,
-                        width: 200, // Adjusted width for better fitting
-                        height: 300, // Adjusted height for better fitting
+                        width: 200, 
+                        height: 300, 
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -93,14 +95,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       ),
                       SizedBox(
                         height: 20,
-                      ), // Adjusted spacing
+                      ), 
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text(
-                              "Description",
+                              "Synopses",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -114,7 +116,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                 color: Color(0xffe3eed4),
                                 fontSize: 16,
                               ),
-                              textAlign: TextAlign.justify,
+                              textAlign: TextAlign.justify,//use to make the show less and show more
                               maxLines: _isExpanded ? null : 3,
                               overflow: _isExpanded
                                   ? TextOverflow.visible
@@ -146,7 +148,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 15), // Adjusted spacing
+                      SizedBox(height: 15), 
                       // Author and Published Date Row side by side
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
@@ -189,11 +191,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                           ],
                         ),
                       ),
-                      // Categories and Print Type Row side by side
+                      // Genre and Print Type Row side by side
                       Row(
                         children: [
                           Text(
-                            'Categories: ',
+                            'Genre: ',
                             style: const TextStyle(
                               color: Color(0xffe3eed4),
                               fontSize: 16,
@@ -228,7 +230,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                         ],
                       ),
                       // Display Preview Link
-                      SizedBox(height: 20), // Adjusted spacing
+                      SizedBox(height: 20),
                       const Text(
                         'Preview Link: ',
                         style: TextStyle(

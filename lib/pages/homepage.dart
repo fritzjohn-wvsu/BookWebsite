@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'navigation.dart'; // Import the navigation bar
-import 'bodysection.dart'; // Import the body section
-import 'popular.dart'; // Import the popular books section
+import 'navigation.dart';
+import 'bodysection.dart'; 
+import 'popular.dart'; 
 import 'update.dart';
 import 'footer.dart';
 
@@ -27,14 +27,14 @@ class _HomepageState extends State<Homepage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               navigationBar(context), // Calling the navigation bar function
-              SizedBox(height: screenHeight * 0.05), // Adjust space dynamically
-              bodySection(), // Calling the body section function
-              SizedBox(height: screenHeight * 0.2), // Adjust space dynamically
+              SizedBox(height: screenHeight * 0.05), 
+              bodySection(context), // Calling the body section function
+              SizedBox(height: screenHeight * 0.2), 
               popularBook(), // Calling the popular books section function
-              SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
-              updateList(context),
-              SizedBox(height: screenHeight * 0.1), // Adjust space dynamically
-              FooterPage(),
+              SizedBox(height: screenHeight * 0.1), 
+              updateList(context),// call the updatelis
+              SizedBox(height: screenHeight * 0.1), 
+              FooterPage(),//call the footer
             ],
           ),
       ),

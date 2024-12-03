@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:main/pages/homepage.dart'; // Ensure this is the correct path
+import 'package:main/pages/homepage.dart'; 
 import 'package:main/pages/booklist.dart';
 import 'package:main/pages/about.dart';
 
@@ -20,7 +20,8 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: 'Homepage',
+      initialRoute: 'Homepage', // first page that will appear
+      //route choices
       routes: {
         'Homepage': (BuildContext ctx) => const Homepage(),
             '/': (context) => Homepage(),

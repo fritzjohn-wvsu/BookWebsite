@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'navigation.dart'; // Import your navigationBar widget
+import 'navigation.dart';
 import 'footer.dart';
 
 class About extends StatefulWidget {
@@ -17,7 +17,7 @@ class _AboutState extends State<About> {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
-      body: SingleChildScrollView( // Wrap the content with SingleChildScrollView
+      body: SingleChildScrollView( // Wrap the content with SingleChildScrollView  to avoid overflow
         child: Column(
           children: [
             // Include the navigation bar at the top
@@ -25,7 +25,7 @@ class _AboutState extends State<About> {
             // The rest of the page content
             Center(
               child: Container(
-                width: 1450, // Responsive width
+                width: 1450, 
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -37,7 +37,7 @@ class _AboutState extends State<About> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildImageSection(),
-                          const SizedBox(width: 50), // Space between image and text
+                          const SizedBox(width: 50),
                           _buildTextSection(),
                         ],
                       )
@@ -45,7 +45,7 @@ class _AboutState extends State<About> {
                       Column(
                         children: [
                           _buildImageSection(),
-                          const SizedBox(height: 20), // Space between image and text
+                          const SizedBox(height: 20), 
                           _buildTextSection(),
                         ],
                       ),
@@ -83,7 +83,7 @@ class _AboutState extends State<About> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Image.asset(
-          'assets/icon1.png', // Ensure this path is correct
+          'assets/icon1.png',
           fit: BoxFit.cover,
         ),
       ),
@@ -114,7 +114,7 @@ class _AboutState extends State<About> {
             style: TextStyle(
               color: const Color(0xffe3eed4),
               fontSize: 20,
-              height: 1.5, // Improves line spacing for readability
+              height: 1.5, 
             ),
           ),
         ],

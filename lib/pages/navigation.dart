@@ -45,9 +45,9 @@ Widget navigationBar(BuildContext context) {
     color: const Color.fromARGB(255, 0, 15, 22),
     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
     child: Padding(
-      padding: const EdgeInsets.only(left: 60, right: 60), // Add padding to left and right
+      padding: const EdgeInsets.only(left: 60, right: 60),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Keep logo and search bar on the ends
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Logo and LITFinds
           Row(
@@ -60,8 +60,8 @@ Widget navigationBar(BuildContext context) {
               ),
               TextButton(
                 onPressed: () {
-                  RouteManager.currentRoute.value = '/home'; // Set to home route
-                  Navigator.pushNamed(context, '/home'); // Navigate to home
+                  RouteManager.currentRoute.value = '/home';
+                  Navigator.pushNamed(context, '/home');
                 },
                 child: const Text(
                   'LITFinds',
@@ -75,10 +75,10 @@ Widget navigationBar(BuildContext context) {
               ),
             ],
           ),
-          // Centered nav items (Home, About, Books)
+          // Centered nav items
           Expanded(
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Center the nav items
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 buildNavItem('Home', '/home'),
                 const SizedBox(width: 30),
@@ -112,7 +112,8 @@ Widget navigationBar(BuildContext context) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SearchPage(query: searchController.text),
+                        builder: (context) =>
+                            SearchPage(query: searchController.text),
                       ),
                     );
                   },
@@ -122,7 +123,8 @@ Widget navigationBar(BuildContext context) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SearchPage(query: query),
+                    builder: (context) =>
+                        SearchPage(query: query),
                   ),
                 );
               },

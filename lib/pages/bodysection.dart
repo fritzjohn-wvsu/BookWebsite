@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'booklist.dart'; 
+import 'route_manager.dart';
 
-Widget bodySection() {
+Widget bodySection(BuildContext context) {
   return Padding(
-    padding: const EdgeInsets.all(20), // Padding around the entire section
+    padding: const EdgeInsets.all(20),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Left Section: Text Content with 40 padding on the left
+        // Left Section: Text Content
         Padding(
-          padding: const EdgeInsets.only(left: 40), // Added left padding of 40
+          padding: const EdgeInsets.only(left: 40),
           child: Expanded(
             flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Main heading
-                SizedBox(height: 70),
+                const SizedBox(height: 70),
                 const Text(
                   "Discover Your Next Favorite",
                   style: TextStyle(
@@ -24,7 +25,6 @@ Widget bodySection() {
                     color: Color(0xffe3eed4),
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.left,
                 ),
                 const Text(
                   "Book, One Recommendation",
@@ -33,7 +33,6 @@ Widget bodySection() {
                     color: Color(0xffe3eed4),
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.left,
                 ),
                 const Text(
                   "at a Time.",
@@ -42,59 +41,50 @@ Widget bodySection() {
                     color: Color(0xffe3eed4),
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.left,
                 ),
                 const SizedBox(height: 20),
-                // Description text
                 const Text(
                   "Discover your next great read and explore a wide range of",
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xffe3eed4),
-                    fontWeight: FontWeight.normal,
                   ),
-                  textAlign: TextAlign.left,
                 ),
                 const Text(
                   "genres, uncover hidden gems, and dive into captivating",
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xffe3eed4),
-                    fontWeight: FontWeight.normal,
                   ),
-                  textAlign: TextAlign.left,
                 ),
                 const Text(
                   "stories—all in one place.",
                   style: TextStyle(
                     fontSize: 16,
                     color: Color(0xffe3eed4),
-                    fontWeight: FontWeight.normal,
                   ),
-                  textAlign: TextAlign.left,
                 ),
-                const SizedBox(height: 20), // Space before the button
-                // Start Now button
+                const SizedBox(height: 20),
                 TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero, // Remove default padding
-                  ),
+                  onPressed: () {
+                    // Set route to Books and navigate
+                    RouteManager.currentRoute.value = '/books';
+                    Navigator.pushNamed(context, '/books');
+                  },
                   child: Container(
-                    width: 200, // Fixed width for the button
-                    height: 50, // Fixed height for the button
+                    width: 200,
+                    height: 50,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10), // Inner padding
+                        vertical: 10, horizontal: 10),
                     decoration: BoxDecoration(
-                      color: Color(0xffe3eed4), // Button background color
+                      color: Color(0xffe3eed4),
                       borderRadius: BorderRadius.circular(24),
                     ),
                     child: const Center(
                       child: Text(
                         'Start Now',
                         style: TextStyle(
-                          color:
-                              Color.fromARGB(255, 0, 15, 22), // Button text color
+                          color: Color.fromARGB(255, 0, 15, 22),
                           fontSize: 18,
                         ),
                       ),
@@ -107,13 +97,13 @@ Widget bodySection() {
         ),
         // Right Section: Image
         Align(
-          alignment: Alignment.topRight, // Adjust alignment to top-center
+          alignment: Alignment.topRight,
           child: SizedBox(
-            width: 800, // Image width
-            height: 450, // Image height
+            width: 800,
+            height: 450,
             child: Image.asset(
-              'assets/pic.png', // Replace with your image asset path
-              fit: BoxFit.cover, // Ensures the image fills the available space
+              'assets/pic.png',
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -121,3 +111,4 @@ Widget bodySection() {
     ),
   );
 }
+

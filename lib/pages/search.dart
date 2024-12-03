@@ -25,9 +25,10 @@ class _SearchPageState extends State<SearchPage> {
     fetchBooks(widget.query);
   }
 
+//fetch the books 
   Future<void> fetchBooks(String query) async {
     final url = Uri.parse(
-        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyC528A8IvyTAHI_8xihahK5tVivc_6MDM0');
+        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -104,7 +105,7 @@ class _SearchPageState extends State<SearchPage> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(
+                                  MaterialPageRoute( //go to bookdetailpage
                                     builder: (context) => BookDetailPage(
                                       title: book['title'] ?? 'No Title',
                                       imageUrl: book['imageLinks']?['thumbnail'],
@@ -127,15 +128,15 @@ class _SearchPageState extends State<SearchPage> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: const Color.fromARGB(255, 0, 15, 22), // Button background color
-                          backgroundColor: const Color(0xffe3eed4), // Button text color
+                          foregroundColor: const Color.fromARGB(255, 0, 15, 22), 
+                          backgroundColor: const Color(0xffe3eed4), 
                           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24), // Rounded corners
+                            borderRadius: BorderRadius.circular(24), 
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context); // Close dropdown and return to the active navigation
+                          Navigator.pop(context); 
                         },
                         child: const Text('Close'),
                       ),
