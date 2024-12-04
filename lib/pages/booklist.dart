@@ -91,7 +91,7 @@ Future<void> fetchBooks() async {
 
 
 //sort the books to a-z to z-a
-  void sortBooks() {
+void sortBooks() {
   if (_selectedSort == 'A-Z') {
     filteredBooks.sort((a, b) {
       final titleA = a['volumeInfo']['title'] ?? '';
@@ -104,25 +104,30 @@ Future<void> fetchBooks() async {
       final titleB = b['volumeInfo']['title'] ?? '';
       return titleB.compareTo(titleA);
     });
-  } else if (_selectedSort == 'Newest') {  //sort the books to newest to lowest
+  } else if (_selectedSort == 'Newest') {
     filteredBooks.sort((a, b) {
-      final dateA = DateTime.tryParse(a['volumeInfo']['publishedDate'] ?? '') ??
-          DateTime(1900);
-      final dateB = DateTime.tryParse(b['volumeInfo']['publishedDate'] ?? '') ??
-          DateTime(1900);
+      final dateA = DateTime.tryParse(a['volumeInfo']['publishedDate'] ?? '') ?? DateTime(1900);
+      final dateB = DateTime.tryParse(b['volumeInfo']['publishedDate'] ?? '') ?? DateTime(1900);
       return dateB.compareTo(dateA);
     });
   } else if (_selectedSort == 'Oldest') {
     filteredBooks.sort((a, b) {
-      final dateA = DateTime.tryParse(a['volumeInfo']['publishedDate'] ?? '') ??
-          DateTime(1900);
-      final dateB = DateTime.tryParse(b['volumeInfo']['publishedDate'] ?? '') ??
-          DateTime(1900);
-      return dateA.compareTo(dateB);
+      final dateA = DateTime.tryParse(a['volumeInfo']['publishedDate'] ?? '') ?? DateTime(1900);
+      final dateB = DateTime.tryParse(b['volumeInfo']['publishedDate'] ?? '') ?? DateTime(1900);
+      // Treat invalid dates as the last item
+      if (dateA.year == 1900 && dateB.year == 1900) {
+        return 0; // Both are invalid, keep the order as it is
+      } else if (dateA.year == 1900) {
+        return 1; // Place invalid dates after valid ones
+      } else if (dateB.year == 1900) {
+        return -1; // Place invalid dates after valid ones
+      }
+      return dateA.compareTo(dateB);  // Sort valid dates from oldest to newest
     });
   }
   setState(() {});
 }
+
 
 
   void filterBooks(String query) {
