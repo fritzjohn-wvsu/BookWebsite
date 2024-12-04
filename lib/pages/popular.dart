@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:math'; // For randomizing the list
-import 'bookDetails.dart'; // Import the BookDetailPage
+import 'dart:math'; 
+import 'bookDetails.dart'; 
 
 // Your Google Books API key
 const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';

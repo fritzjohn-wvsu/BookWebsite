@@ -53,7 +53,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         ),
         backgroundColor: const Color.fromARGB(255, 0, 15, 22),
         iconTheme: const IconThemeData(
-          color: Colors.white,
+          color: Color(0xffe3eed4),
         ),
       ),
       body: SingleChildScrollView(

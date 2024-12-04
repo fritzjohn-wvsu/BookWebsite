@@ -284,14 +284,17 @@ Future<void> fetchBooks() async {
                             child: TextField(
                               controller: _searchController,
                               onChanged: filterBooks,
+                              style: const TextStyle(
+                                color: Color(0xffe3eed4),  // Text color for the entered text
+                                fontSize: 14,
+                              ),
                               decoration: InputDecoration(
                                 hintText: 'Search by title or author...',
                                 hintStyle: const TextStyle(
                                   color: Color(0xffe3eed4),
                                   fontSize: 14,
                                 ),
-                                contentPadding:
-                                    const EdgeInsets.symmetric(horizontal: 30),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 30),
                                 filled: true,
                                 fillColor: const Color(0xff293d3e),
                                 border: OutlineInputBorder(
@@ -308,6 +311,7 @@ Future<void> fetchBooks() async {
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 5),
                           // Combined Row for Genre and Sort Dropdowns, Centered
                           Center(
