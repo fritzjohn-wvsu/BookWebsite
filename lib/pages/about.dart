@@ -3,7 +3,7 @@ import 'navigation.dart';
 import 'footer.dart';
 
 class About extends StatefulWidget {
-  const About({Key? key}) : super(key: key);
+  const About({super.key});
 
   @override
   _AboutState createState() => _AboutState();
@@ -17,7 +17,8 @@ class _AboutState extends State<About> {
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
-      body: SingleChildScrollView( // Wrap the content with SingleChildScrollView  to avoid overflow
+      body: SingleChildScrollView(
+        // Wrap the content with SingleChildScrollView  to avoid overflow
         child: Column(
           children: [
             // Include the navigation bar at the top
@@ -25,7 +26,7 @@ class _AboutState extends State<About> {
             // The rest of the page content
             Center(
               child: Container(
-                width: 1450, 
+                width: 1450,
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -45,7 +46,7 @@ class _AboutState extends State<About> {
                       Column(
                         children: [
                           _buildImageSection(),
-                          const SizedBox(height: 20), 
+                          const SizedBox(height: 20),
                           _buildTextSection(),
                         ],
                       ),
@@ -54,15 +55,15 @@ class _AboutState extends State<About> {
               ),
             ),
             const Text(
-                "© 2024, 3N1. All rights reserved.",
-                style: TextStyle(
-                  color: Color(0xffe3eed4),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
+              "© 2024, 3N1. All rights reserved.",
+              style: TextStyle(
+                color: Color(0xffe3eed4),
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 30),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 30),
             // Footer section
             FooterPage(),
           ],
@@ -112,9 +113,9 @@ class _AboutState extends State<About> {
             'allows users to explore and uncover books across a wide range of genres. '
             'Whether you love mysteries, thrillers, or romantic tales, LITFinds has the perfect recommendation waiting for you.',
             style: TextStyle(
-              color: const Color(0xffe3eed4),
+              color: Color(0xffe3eed4),
               fontSize: 20,
-              height: 1.5, 
+              height: 1.5,
             ),
           ),
         ],

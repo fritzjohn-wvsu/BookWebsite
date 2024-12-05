@@ -110,4 +110,3 @@ Widget bodySection(BuildContext context) {
     ),
   );
 }
-

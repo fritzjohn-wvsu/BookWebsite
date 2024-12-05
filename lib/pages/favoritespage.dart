@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'bookDetails.dart'; // Import BookDetailPage for navigation
 
 class FavoriteBooksPage extends StatelessWidget {
+  const FavoriteBooksPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +34,8 @@ class FavoriteBooksPage extends StatelessWidget {
             color: const Color(0xff1b2a38),
             child: ListTile(
               leading: book['imageUrl'] != null
-                  ? Image.network(book['imageUrl'], width: 50, height: 75, fit: BoxFit.cover)
+                  ? Image.network(book['imageUrl'],
+                      width: 50, height: 75, fit: BoxFit.cover)
                   : const SizedBox(width: 50, height: 75),
               title: Text(
                 book['title'],

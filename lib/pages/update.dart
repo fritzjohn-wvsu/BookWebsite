@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bookDetails.dart'; 
+import 'bookDetails.dart';
 
 // Google Books API key
-const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
+const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
 
+/// Fetches books from the Google Books API based on queries.
 Future<List<dynamic>> fetchBooks() async {
   final urls = [
     'https://www.googleapis.com/books/v1/volumes?q=fiction&key=$googleBooksApiKey',
@@ -15,34 +16,28 @@ Future<List<dynamic>> fetchBooks() async {
   List<dynamic> allBooks = [];
 
   try {
-    final responses = await Future.wait(
-      urls.map((url) async {
-        final response = await http.get(Uri.parse(url));
-        return response;
-      }),
-    );
+    final responses =
+        await Future.wait(urls.map((url) => http.get(Uri.parse(url))));
 
+    // Collecting book items from all the responses
     for (var response in responses) {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final items = data['items'] ?? [];
-
-        for (var item in items) {
-          allBooks.add(item);
-        }
+        allBooks.addAll(items);
       } else {
         debugPrint('Error fetching books: ${response.statusCode}');
       }
     }
 
-    // Sort books by the publication date in descending order
+    // Sort books by published date in descending order
     allBooks.sort((a, b) {
       final dateA = a['volumeInfo']['publishedDate'] ?? '';
       final dateB = b['volumeInfo']['publishedDate'] ?? '';
       return dateB.compareTo(dateA); // Descending order by date
     });
 
-    // Limit to only the 10 latest books
+    // Limit to the 10 latest books
     return allBooks.take(10).toList();
   } catch (e) {
     debugPrint('Error fetching books: $e');
@@ -50,24 +45,29 @@ Future<List<dynamic>> fetchBooks() async {
   }
 }
 
+/// Widget to display a book with its details.
 Widget bookRectangle(
-    BuildContext context, // Accept context here
-    String bookName,
-    String? imageUrl,
-    String description,
-    String author,
-    String publishedDate,
-    String categories,
-    String printType,
-    String previewLink) {
+  BuildContext context,
+  String bookId,
+  String bookName,
+  String? imageUrl, // Allow imageUrl to be nullable
+  String description,
+  String author,
+  String publishedDate,
+  String categories,
+  String printType,
+  String previewLink,
+) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
-        context, // Use the passed context
+        context,
         MaterialPageRoute(
           builder: (context) => BookDetailPage(
+            bookId: bookId,
             title: bookName,
-            imageUrl: imageUrl,
+            imageUrl: imageUrl ??
+                'https://via.placeholder.com/150', // Default image if null
             description: description,
             author: author,
             publishedDate: publishedDate,
@@ -94,6 +94,10 @@ Widget bookRectangle(
                   )
                 : null,
           ),
+          child: imageUrl == null
+              ? const Center(
+                  child: Icon(Icons.book, color: Colors.white, size: 60))
+              : null,
         ),
         const SizedBox(height: 8),
         // Book Title
@@ -112,7 +116,7 @@ Widget bookRectangle(
             textAlign: TextAlign.center,
           ),
         ),
-        // Publication Date on a new line
+        // Publication Date
         SizedBox(
           width: 200,
           child: Text(
@@ -131,7 +135,8 @@ Widget bookRectangle(
   );
 }
 
-Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {  // Pass context here
+/// Builds a grid view of books.
+Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {
   return GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
@@ -145,23 +150,26 @@ Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {  // Pass co
     itemBuilder: (context, index) {
       final volumeInfo = bookList[index]['volumeInfo'];
       final title = volumeInfo['title'] ?? 'Unknown Title';
-      final imageUrl = volumeInfo['imageLinks']?['thumbnail'];
+      final imageUrl = volumeInfo['imageLinks'] != null
+          ? volumeInfo['imageLinks']['thumbnail']
+          : null;
       final description =
           volumeInfo['description'] ?? 'No description available';
       final author =
-          volumeInfo['authors'] != null && volumeInfo['authors'].isNotEmpty
+          (volumeInfo['authors'] != null && volumeInfo['authors'].isNotEmpty)
               ? volumeInfo['authors'][0]
               : 'Unknown Author';
       final publishedDate = volumeInfo['publishedDate'] ?? 'Unknown Date';
-      final categories = volumeInfo['categories'] != null &&
-              volumeInfo['categories'].isNotEmpty
+      final categories = (volumeInfo['categories'] != null &&
+              volumeInfo['categories'].isNotEmpty)
           ? volumeInfo['categories'].join(', ')
           : 'No categories available';
       final printType = volumeInfo['printType'] ?? 'Unknown';
       final previewLink = volumeInfo['previewLink'] ?? '';
 
       return bookRectangle(
-        context,  // Pass context here
+        context,
+        bookList[index]['id'], // Pass the correct bookId
         title,
         imageUrl,
         description,
@@ -175,6 +183,7 @@ Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {  // Pass co
   );
 }
 
+/// Widget to display the latest updates.
 Widget updateList(BuildContext context) {
   return FutureBuilder<List<dynamic>>(
     future: fetchBooks(),
@@ -209,7 +218,7 @@ Widget updateList(BuildContext context) {
                 height: 20,
               ),
               const SizedBox(height: 25),
-              buildBookGrid(books, context), // Pass context to buildBookGrid
+              buildBookGrid(books, context),
             ],
           ),
         ),

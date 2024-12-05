@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:math'; 
-import 'bookDetails.dart'; 
+import 'dart:math';
+import 'bookDetails.dart';
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
+const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
 
 // Fetch books from Google Books API
 Future<List<dynamic>> fetchBooks() async {
@@ -21,7 +21,8 @@ Future<List<dynamic>> fetchBooks() async {
         return response;
       }),
     );
-//fetch the books
+
+    // Fetch the books
     List<dynamic> allBooks = [];
 
     for (var response in responses) {
@@ -94,9 +95,11 @@ Widget popularBook() {
                       mainAxisSpacing: 10.0,
                       childAspectRatio: 200 / 300,
                     ),
-                    itemCount: books.length, // get all the description
+                    itemCount: books.length,
                     itemBuilder: (context, index) {
-                      final volumeInfo = books[index]['volumeInfo'];
+                      final book = books[index];
+                      final volumeInfo = book['volumeInfo'];
+                      final bookId = book['id'] ?? 'Unknown ID'; // Fixed
                       final title = volumeInfo['title'] ?? 'Unknown Title';
                       final imageUrl = volumeInfo['imageLinks']?['thumbnail'];
                       final description = volumeInfo['description'] ??
@@ -121,6 +124,7 @@ Widget popularBook() {
                             context,
                             MaterialPageRoute(
                               builder: (context) => BookDetailPage(
+                                bookId: bookId, // Pass the book ID
                                 title: title,
                                 imageUrl: imageUrl,
                                 description: description,
@@ -149,6 +153,11 @@ Widget popularBook() {
                                       )
                                     : null,
                               ),
+                              child: imageUrl == null
+                                  ? const Center(
+                                      child: Icon(Icons.book, size: 60),
+                                    )
+                                  : null,
                             ),
                             const SizedBox(height: 8),
                             // Book Title

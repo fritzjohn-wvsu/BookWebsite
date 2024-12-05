@@ -3,6 +3,8 @@ import 'bookDetails.dart'; // Ensure this matches your file structure
 import 'navigation.dart'; // Import your Navbar widget here
 
 class FavoritesPage extends StatefulWidget {
+  const FavoritesPage({super.key});
+
   @override
   _FavoritesPageState createState() => _FavoritesPageState();
 }
@@ -16,7 +18,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
         children: [
           // Your custom Navbar
           navigationBar(context),
-          
+
           Expanded(
             child: ListView.builder(
               itemCount: BookDetailPage.favoriteBooks.length,

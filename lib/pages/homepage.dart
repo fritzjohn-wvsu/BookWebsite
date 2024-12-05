@@ -18,7 +18,7 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
 
-    RouteManager.currentRoute.value = '/home';
+    RouteManager.currentRoute.value = '/homepage';
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
@@ -26,18 +26,18 @@ class _HomepageState extends State<Homepage> {
         children: [
           // Scrollable content
           SingleChildScrollView(
-            padding: EdgeInsets.only(top: 60), 
+            padding: EdgeInsets.only(top: 60),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 SizedBox(height: screenHeight * 0.05),
-                bodySection(context), 
+                bodySection(context),
                 SizedBox(height: screenHeight * 0.2),
-                popularBook(), 
+                popularBook(),
                 SizedBox(height: screenHeight * 0.1),
-                updateList(context), 
+                updateList(context),
                 SizedBox(height: screenHeight * 0.1),
-                FooterPage(), 
+                FooterPage(),
               ],
             ),
           ),

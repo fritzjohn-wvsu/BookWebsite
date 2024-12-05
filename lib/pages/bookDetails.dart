@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'favoritespage.dart'; // Import the FavoriteBooksPage
 
 class BookDetailPage extends StatefulWidget {
+  final String bookId;
   final String title;
-  final String? imageUrl;
+  final String imageUrl;
   final String description;
   final String author;
   final String publishedDate;
@@ -13,16 +13,17 @@ class BookDetailPage extends StatefulWidget {
   final String previewLink;
 
   const BookDetailPage({
-    Key? key,
+    super.key,
+    required this.bookId,
     required this.title,
-    this.imageUrl,
+    required this.imageUrl,
     required this.description,
     required this.author,
     required this.publishedDate,
     required this.categories,
     required this.printType,
     required this.previewLink,
-  }) : super(key: key);
+  });
 
   static List<Map<String, dynamic>> favoriteBooks = [];
 
@@ -44,7 +45,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
   void _toggleFavorite() {
     setState(() {
       if (_isFavorite) {
-        BookDetailPage.favoriteBooks.removeWhere((book) => book['title'] == widget.title);
+        BookDetailPage.favoriteBooks
+            .removeWhere((book) => book['title'] == widget.title);
       } else {
         BookDetailPage.favoriteBooks.add({
           'title': widget.title,
@@ -61,21 +63,12 @@ class _BookDetailPageState extends State<BookDetailPage> {
     });
   }
 
-  Future<void> _launchURL() async {
-    final Uri url = Uri.parse(widget.previewLink);
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
+  Future<void> _launchPreviewLink() async {
+    if (await canLaunch(widget.previewLink)) {
+      await launch(widget.previewLink);
     } else {
-      throw 'Could not launch ${widget.previewLink}';
+      throw 'Could not open preview link';
     }
-  }
-
-  // Navigation method to go to the FavoriteBooksPage
-  void _navigateToFavorites() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FavoriteBooksPage()),
-    );
   }
 
   @override
@@ -88,158 +81,212 @@ class _BookDetailPageState extends State<BookDetailPage> {
           style: TextStyle(color: Color(0xffe3eed4)),
         ),
         backgroundColor: const Color.fromARGB(255, 0, 15, 22),
-        iconTheme: const IconThemeData(color: Color(0xffe3eed4)),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(100),
+        child: Row(
+          crossAxisAlignment:
+              CrossAxisAlignment.start, // Align the content properly
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (widget.imageUrl != null)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
+            // Left side: Image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                color: Colors.white,
+                child: Image.network(
+                  widget.imageUrl,
+                  width: 200,
+                  height: 300,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(width: 30),
+
+            // Right side: Book Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            widget.title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            _isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: _isFavorite ? Colors.red : Colors.white,
+                          ),
+                          onPressed: _toggleFavorite,
+                        ),
+                        Text(
+                          _isFavorite
+                              ? "Added to Favorites"
+                              : "Add to Favorites",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  // Description above the author, published, genre, and print type
+                  const SizedBox(height: 20),
+                  const Text(
+                    "Synopsis",
+                    style: TextStyle(
                       color: Colors.white,
-                      child: Image.network(
-                        widget.imageUrl!,
-                        width: 200,
-                        height: 300,
-                        fit: BoxFit.cover,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.description,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                    maxLines: _isExpanded ? null : 3,
+                    overflow: _isExpanded
+                        ? TextOverflow.visible
+                        : TextOverflow.ellipsis,
+                  ),
+                  Center(
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isExpanded = !_isExpanded;
+                        });
+                      },
+                      child: Text(
+                        _isExpanded ? "Show Less" : "Show More",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                const SizedBox(width: 25),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                  const SizedBox(height: 20),
+
+                  // Author and Published Date in one row
+                  Row(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                                    color: _isFavorite ? Color(0xffe3eed4) : Color(0xffe3eed4),
-                                  ),
-                                  onPressed: _toggleFavorite,
-                                ),
-                              ],
-                            ),
-                          ],
+                      Text(
+                        'Author: ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Author: ${widget.author}',
-                            style: const TextStyle(
-                              color: Color(0xffe3eed4),
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(width: 30),
-                          Text(
-                            'Published: ${widget.publishedDate}',
-                            style: const TextStyle(
-                              color: Color(0xffe3eed4),
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        widget.author,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold, // Make the author bold
+                        ),
                       ),
-                      const SizedBox(height: 15),
-                      Row(
-                        children: [
-                          Text(
-                            'Genre: ${widget.categories}',
-                            style: const TextStyle(
-                              color: Color(0xffe3eed4),
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(width: 30),
-                          Text(
-                            'Print Type: ${widget.printType}',
-                            style: const TextStyle(
-                              color: Color(0xffe3eed4),
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(width: 30),
+                      Text(
+                        'Published: ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        widget.publishedDate,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight:
+                              FontWeight.bold, // Make the published date bold
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              "Synopsis",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              widget.description,
-              style: const TextStyle(
-                color: Color(0xffe3eed4),
-                fontSize: 16,
-              ),
-              maxLines: _isExpanded ? null : 3,
-              overflow: _isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
-              child: Text(
-                _isExpanded ? "Show Less" : "Show More",
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Preview Link:',
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            GestureDetector(
-              onTap: _launchURL,
-              child: Text(
-                widget.previewLink,
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  decoration: TextDecoration.underline,
-                ),
+
+                  const SizedBox(height: 20),
+
+                  // Genre and Print Type in one row
+                  Row(
+                    children: [
+                      Text(
+                        'Genre: ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        widget.categories,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold, // Make the genre bold
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                      Text(
+                        'Print Type: ',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Text(
+                        widget.printType,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight:
+                              FontWeight.bold, // Make the print type bold
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Preview Link
+                  const Text(
+                    'Preview Link:',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  GestureDetector(
+                    onTap: _launchPreviewLink,
+                    child: Text(
+                      widget.previewLink,
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

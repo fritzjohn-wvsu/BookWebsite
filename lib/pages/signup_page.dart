@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'login_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:main/pages/homepage.dart';
+import '/pages/homepage.dart';
 
 final _formKey = GlobalKey<FormState>();
 
@@ -17,12 +19,17 @@ class SignUp extends StatefulWidget {
 }
 
 class _HomePageState extends State<SignUp> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String? validateEmail(String? email) {
     if (email == null || email.isEmpty) {
@@ -39,6 +46,10 @@ class _HomePageState extends State<SignUp> {
   String? validateUsername(String? username) {
     if (username == null || username.isEmpty) {
       return 'Username is required';
+    }
+    if (username.length < 5) {
+      // This ensures the username is at least 5 characters
+      return 'Username must be at least 5 characters';
     }
     return null;
   }
@@ -63,76 +74,100 @@ class _HomePageState extends State<SignUp> {
     return null;
   }
 
-  // Function to show the validation dialog
-  void showDialogValidation(BuildContext context) {
-    // Check if the form is valid (all fields are filled correctly)
+  // Function to handle sign up
+  Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
-      // If all fields are valid, show the confirmation dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Confirm Information'),
-            content: const Text(
-              'By signing in, you agree to the use of your information and enhance your experience.',
-            ),
-            actions: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    child: const Text('Cancel'),
-                    onPressed: () {
-                      Navigator.pop(context, 'Cancel');
-                    },
-                  ),
-                  TextButton(
-                    child: const Text('Confirm'),
-                    onPressed: () {
-                      Navigator.pop(context, 'Confirm');
-                      // Navigate to the LoginPage after confirmation
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Login(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      // If validation fails, show an error dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content:
-                const Text('Please make sure all fields are correctly filled.'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.pop(context); 
-                },
-              ),
-            ],
-          );
-        },
-      );
+      try {
+        // Create user with email and password
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Store user data (username, email, and created_at timestamp) in Firestore
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'username': _usernameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'created_at': FieldValue.serverTimestamp(), // Add timestamp here
+        });
+
+        // Show success dialog
+        _showDialog(context, 'Success', 'Account created successfully!');
+
+        // Navigate to Login page after success
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } catch (e) {
+        _showDialog(context, 'Error', 'Failed to create account: $e');
+      }
     }
+  }
+
+  // Function to show a dialog
+  void _showDialog(BuildContext context, String title, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Helper function to build TextFormField
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required Icon icon,
+    required String? Function(String?) validator,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return SizedBox(
+      width: 500,
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        style: const TextStyle(color: Color(0xffe3eed4)),
+        decoration: InputDecoration(
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: icon,
+          ),
+          suffixIcon: suffixIcon,
+          border: const OutlineInputBorder(),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+          ),
+          labelText: label,
+          labelStyle: const TextStyle(color: Color(0xffe3eed4)),
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xffe3eed4)),
+        ),
+        validator: validator,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 0, 15, 22),
+        backgroundColor: const Color.fromARGB(255, 229, 233, 236),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xffe3eed4)),
@@ -140,284 +175,177 @@ class _HomePageState extends State<SignUp> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const Homepage(), 
+                builder: (context) => const Homepage(),
               ),
             );
           },
         ),
       ),
-      backgroundColor: Color.fromARGB(255, 0, 15, 22),
+      backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(0),
+          padding: const EdgeInsets.all(20.0),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Sign up title section
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: 0, left: 50, right: 50, bottom: 50),
+                const Padding(
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    "Sign Up",
+                    style: TextStyle(
+                      color: Color(0xffe3eed4),
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Column(
-                      children: [
-                        Text(
-                          "Sign In",
-                          style: TextStyle(
-                            color: Color(0xffe3eed4),
-                            fontSize: 50,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Create Your Account!",
-                          style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 50),
-                // Username field
-                Container(
-                  width: 500,
-                  child: TextFormField(
-                    style: TextStyle(color: Color(0xffe3eed4)),
-                    decoration: InputDecoration(
-                      prefixIcon: Padding(
-                        padding: EdgeInsets.all(0.0),
-                        child: Icon(
-                          Icons.person,
-                          color: Color(0xffe3eed4),
-                        ),
-                      ),
-                      border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
-                      ),
-                      labelText: 'Username',
-                      labelStyle: TextStyle(color: Color(0xffe3eed4)),
-                      hintText: 'Enter your usrname',
-                      hintStyle: TextStyle(color: Color(0xffe3eed4)),
-                    ),
-                    validator: validateUsername,
                   ),
                 ),
-                SizedBox(height: 20),
-                // Email field
-                Container(
-                  width: 500,
-                  child: TextFormField(
-                    style: TextStyle(color: Color(0xffe3eed4)),
-                    decoration: InputDecoration(
-                      prefixIcon: Padding(
-                        padding: EdgeInsets.all(0.0),
-                        child: Icon(
-                          Icons.email,
-                          color: Color(0xffe3eed4),
-                        ),
-                      ),
-                      border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
-                      ),
-                      labelText: 'E-mail Address',
-                      labelStyle: TextStyle(color: Color(0xffe3eed4)),
-                      hintText: 'Enter your email',
-                      hintStyle: TextStyle(color: Color(0xffe3eed4)),
-                    ),
-                    validator: validateEmail,
-                  ),
+                const Text(
+                  "Create Your Account!",
+                  style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
                 ),
-                SizedBox(height: 20),
-                // Password field
-                Container(
-                  width: 500,
-                  child: TextFormField(
-                    controller: _passwordController,
-                    obscureText: !_isPasswordVisible,
-                    style: TextStyle(color: Color(0xffe3eed4)),
-                    decoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
-                      ),
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.all(0.0),
-                        child: Icon(
-                          Icons.lock,
-                          color: Color(0xffe3eed4),
-                        ),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Color(0xffe3eed4),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                      border: const OutlineInputBorder(),
-                      labelText: 'Password',
-                      labelStyle: TextStyle(color: Color(0xffe3eed4)),
-                      hintText: 'Enter your password',
-                      hintStyle: TextStyle(color: Color(0xffe3eed4)),
-                    ),
-                    validator: validatePassword,
-                  ),
+                const SizedBox(height: 50),
+                buildTextField(
+                  controller: _usernameController,
+                  label: 'Username',
+                  hint: 'Enter your username (5 characters)',
+                  icon: const Icon(Icons.person, color: Color(0xffe3eed4)),
+                  validator: validateUsername,
                 ),
-                SizedBox(height: 20),
-                // Confirm Password field
-                Container(
-                  width: 500,
-                  child: TextFormField(
-                    controller: _confirmPasswordController,
-                    obscureText: !_isConfirmPasswordVisible,
-                    style: TextStyle(color: Color(0xffe3eed4)),
-                    decoration: InputDecoration(
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
-                      ),
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.all(0.0),
-                        child: Icon(
-                          Icons.check,
-                          color: Color(0xffe3eed4),
-                        ),
-                      ),
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isConfirmPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Color(0xffe3eed4),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isConfirmPasswordVisible =
-                                !_isConfirmPasswordVisible;
-                          });
-                        },
-                      ),
-                      border: const OutlineInputBorder(),
-                      labelText: 'Confirm Password',
-                      labelStyle: TextStyle(color: Color(0xffe3eed4)),
-                      hintText: 'Confirm your password',
-                      hintStyle: TextStyle(color: Color(0xffe3eed4)),
-                    ),
-                    validator: validateConfirmPassword,
-                  ),
+                const SizedBox(height: 20),
+                buildTextField(
+                  controller: _emailController,
+                  label: 'E-mail Address',
+                  hint: 'Enter your email',
+                  icon: const Icon(Icons.email, color: Color(0xffe3eed4)),
+                  validator: validateEmail,
                 ),
-                SizedBox(height: 20),
-                // Sign Up button
-                Container(
+                const SizedBox(height: 20),
+                buildTextField(
+                  controller: _passwordController,
+                  label: 'Password',
+                  hint: 'Enter your password',
+                  icon: const Icon(Icons.lock, color: Color(0xffe3eed4)),
+                  obscureText: true,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: const Color(0xffe3eed4),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                  validator: validatePassword,
+                ),
+                const SizedBox(height: 20),
+                buildTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirm Password',
+                  hint: 'Confirm your password',
+                  icon: const Icon(Icons.check, color: Color(0xffe3eed4)),
+                  obscureText: true,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isConfirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: const Color(0xffe3eed4),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                      });
+                    },
+                  ),
+                  validator: validateConfirmPassword,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
                   width: 200,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 25),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      padding: const EdgeInsets.symmetric(vertical: 25),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      backgroundColor: const Color(0xffe3eed4),
                     ),
-                    backgroundColor: Color(0xffe3eed4),
-                  ),
-                    onPressed: () {
-                      showDialogValidation(context); 
-                    },
+                    onPressed: _signUp,
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 0, 15, 22)),
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 0, 15, 22),
+                      ),
                     ),
                   ),
                 ),
-                // Sign in with Google button
-                const SizedBox(height: 30),
-                Container(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                  child: const Text(
-                    "Or Sign In with",
-                    style: TextStyle(
-                      color: Color(0xffe3eed4),
-                      fontSize: 12,
+                const SizedBox(height: 20),
+                const Text(
+                  "Or Sign In with",
+                  style: TextStyle(
+                    color: Color(0xffe3eed4),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.facebook,
+                        color: const Color(0xffe3eed4),
+                      ),
+                      onPressed: () {},
                     ),
-                  ),
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.twitter,
+                        color: const Color(0xffe3eed4),
+                      ),
+                      onPressed: () {},
+                    ),
+                    IconButton(
+                      icon: FaIcon(
+                        FontAwesomeIcons.google,
+                        color: const Color(0xffe3eed4),
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
                 ),
-                
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center, 
-                    children: [
-                      IconButton(
-                        icon: FaIcon(
-                          FontAwesomeIcons.facebook,
-                          color: Color(0xffe3eed4), 
-                        ),
-                        onPressed: () {
-                        },
-                      ),
-                      IconButton(
-                        icon: FaIcon(
-                          FontAwesomeIcons.twitter,
-                          color: Color(0xffe3eed4), 
-                        ),
-                        onPressed: () {
-                        },
-                      ),
-                      IconButton(
-                        icon: FaIcon(
-                          FontAwesomeIcons.instagram,
-                          color: Color(0xffe3eed4), 
-                        ),
-                        onPressed: () {
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                
-                SizedBox(height: 20),
-                
-                // Already have an account text
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Already have an Account?",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xffe3eed4),
-                      ),
+                      "Already have an account?",
+                      style: TextStyle(color: Color(0xffe3eed4)),
                     ),
                     TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 0, 15, 22),
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Login()),
-                        );
-                      },
                       child: const Text(
-                        'Log in',
+                        'Log In',
                         style: TextStyle(
-                          fontSize: 12,
                           color: Color(0xffe3eed4),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginPage(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
