@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bookDetails.dart'; 
+import 'bookDetails.dart';
 
 // Google Books API key
 const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
@@ -131,7 +131,8 @@ Widget bookRectangle(
   );
 }
 
-Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {  // Pass context here
+Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {
+  // Pass context here
   return GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
@@ -161,7 +162,7 @@ Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {  // Pass co
       final previewLink = volumeInfo['previewLink'] ?? '';
 
       return bookRectangle(
-        context,  // Pass context here
+        context, // Pass context here
         title,
         imageUrl,
         description,

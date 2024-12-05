@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_page.dart'; 
+import 'login_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:main/pages/homepage.dart';
 
@@ -65,9 +65,7 @@ class _HomePageState extends State<SignUp> {
 
   // Function to show the validation dialog
   void showDialogValidation(BuildContext context) {
-    // Check if the form is valid (all fields are filled correctly)
     if (_formKey.currentState!.validate()) {
-      // If all fields are valid, show the confirmation dialog
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -118,7 +116,7 @@ class _HomePageState extends State<SignUp> {
               TextButton(
                 child: const Text('OK'),
                 onPressed: () {
-                  Navigator.pop(context); 
+                  Navigator.pop(context);
                 },
               ),
             ],
@@ -140,7 +138,7 @@ class _HomePageState extends State<SignUp> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const Homepage(), 
+                builder: (context) => const Homepage(),
               ),
             );
           },
@@ -174,7 +172,8 @@ class _HomePageState extends State<SignUp> {
                         ),
                         Text(
                           "Create Your Account!",
-                          style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
+                          style:
+                              TextStyle(color: Color(0xffe3eed4), fontSize: 15),
                         ),
                       ],
                     ),
@@ -196,7 +195,8 @@ class _HomePageState extends State<SignUp> {
                       ),
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+                        borderSide:
+                            BorderSide(color: Color(0xffe3eed4), width: 2.0),
                       ),
                       labelText: 'Username',
                       labelStyle: TextStyle(color: Color(0xffe3eed4)),
@@ -222,7 +222,8 @@ class _HomePageState extends State<SignUp> {
                       ),
                       border: OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+                        borderSide:
+                            BorderSide(color: Color(0xffe3eed4), width: 2.0),
                       ),
                       labelText: 'E-mail Address',
                       labelStyle: TextStyle(color: Color(0xffe3eed4)),
@@ -242,7 +243,8 @@ class _HomePageState extends State<SignUp> {
                     style: TextStyle(color: Color(0xffe3eed4)),
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+                        borderSide:
+                            BorderSide(color: Color(0xffe3eed4), width: 2.0),
                       ),
                       prefixIcon: const Padding(
                         padding: EdgeInsets.all(0.0),
@@ -283,7 +285,8 @@ class _HomePageState extends State<SignUp> {
                     style: TextStyle(color: Color(0xffe3eed4)),
                     decoration: InputDecoration(
                       focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+                        borderSide:
+                            BorderSide(color: Color(0xffe3eed4), width: 2.0),
                       ),
                       prefixIcon: const Padding(
                         padding: EdgeInsets.all(0.0),
@@ -321,14 +324,14 @@ class _HomePageState extends State<SignUp> {
                   width: 200,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 25),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
+                      padding: const EdgeInsets.symmetric(vertical: 25),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      backgroundColor: Color(0xffe3eed4),
                     ),
-                    backgroundColor: Color(0xffe3eed4),
-                  ),
                     onPressed: () {
-                      showDialogValidation(context); 
+                      showDialogValidation(context);
                     },
                     child: const Text(
                       'Sign Up',
@@ -351,42 +354,38 @@ class _HomePageState extends State<SignUp> {
                     ),
                   ),
                 ),
-                
+
                 Container(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center, 
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
                         icon: FaIcon(
                           FontAwesomeIcons.facebook,
-                          color: Color(0xffe3eed4), 
+                          color: Color(0xffe3eed4),
                         ),
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                       IconButton(
                         icon: FaIcon(
                           FontAwesomeIcons.twitter,
-                          color: Color(0xffe3eed4), 
+                          color: Color(0xffe3eed4),
                         ),
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                       IconButton(
                         icon: FaIcon(
                           FontAwesomeIcons.instagram,
-                          color: Color(0xffe3eed4), 
+                          color: Color(0xffe3eed4),
                         ),
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                     ],
                   ),
                 ),
 
-                
                 SizedBox(height: 20),
-                
+
                 // Already have an account text
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
