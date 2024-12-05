@@ -22,8 +22,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: 'Homepage', // first page that will appear
-      //route choices
+      initialRoute: 'Homepage', 
       routes: {
         'Homepage': (BuildContext ctx) => const Homepage(),
         '/': (context) => Homepage(),
