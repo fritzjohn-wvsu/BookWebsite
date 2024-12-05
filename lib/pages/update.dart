@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'bookDetails.dart'; // Assuming this is the BookDetailPage
+import 'bookDetails.dart'; 
 
-// Your Google Books API key
+// Google Books API key
 const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';
 
 Future<List<dynamic>> fetchBooks() async {

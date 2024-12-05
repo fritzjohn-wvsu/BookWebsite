@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:main/pages/homepage.dart';
-import 'booklist.dart';
-import 'about.dart';
-import 'search.dart'; // Import the Search page
+import 'search.dart'; 
 import 'package:main/pages/route_manager.dart';
 
 Widget navigationBar(BuildContext context) {
@@ -45,35 +42,26 @@ Widget navigationBar(BuildContext context) {
     color: const Color.fromARGB(255, 0, 15, 22),
     padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
     child: Padding(
-      padding: const EdgeInsets.only(left: 60, right: 60),
+      padding: const EdgeInsets.only(left: 25, right: 25),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Logo and LITFinds
-          Row(
-            children: [
-              Image.asset(
-                'assets/icon1.png',
-                width: 50,
-                height: 50,
-                fit: BoxFit.contain,
-              ),
-              TextButton(
-                onPressed: () {
-                  RouteManager.currentRoute.value = '/home';
-                  Navigator.pushNamed(context, '/home');
-                },
-                child: const Text(
-                  'LITFinds',
-                  style: TextStyle(
-                    color: Color(0xffe3eed4),
-                    fontFamily: "TanMerigue",
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+          GestureDetector(
+            onTap: () {
+              RouteManager.currentRoute.value = '/home';
+              Navigator.pushNamed(context, '/home');
+            },
+            child: Row(
+              children: [
+                Image.asset(
+                  'assets/icon1.png',
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.contain,
                 ),
-              ),
-            ],
+                const SizedBox(width: 10),
+              ],
+            ),
           ),
           // Centered nav items
           Expanded(
@@ -88,47 +76,63 @@ Widget navigationBar(BuildContext context) {
               ],
             ),
           ),
-          // Search bar
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0),
-            width: 250,
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'Search...',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Color(0xffe3eed4),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 12.0,
-                ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.search, color: Color.fromARGB(255, 0, 15, 22)),
-                  onPressed: () {
+          // Search bar and Profile icon
+          Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                width: 250,
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search...',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Color(0xffe3eed4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16.0,
+                      vertical: 12.0,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search, color: Color.fromARGB(255, 0, 15, 22)),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SearchPage(query: searchController.text),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  onSubmitted: (query) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            SearchPage(query: searchController.text),
+                            SearchPage(query: query),
                       ),
                     );
                   },
                 ),
               ),
-              onSubmitted: (query) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        SearchPage(query: query),
-                  ),
-                );
-              },
-            ),
+              const SizedBox(width: 10),
+              // Profile Icon
+              IconButton(
+                icon: const Icon(
+                  Icons.account_circle,
+                  size: 45,
+                  color: Color(0xffe3eed4),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/login'); 
+                },
+              ),
+            ],
           ),
         ],
       ),
