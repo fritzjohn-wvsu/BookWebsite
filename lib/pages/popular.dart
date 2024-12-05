@@ -5,7 +5,7 @@ import 'dart:math';
 import 'bookDetails.dart'; 
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';
+const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
 
 // Fetch books from Google Books API
 Future<List<dynamic>> fetchBooks() async {

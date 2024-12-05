@@ -28,7 +28,7 @@ class _SearchPageState extends State<SearchPage> {
 //fetch the books 
   Future<void> fetchBooks(String query) async {
     final url = Uri.parse(
-        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34');
+        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

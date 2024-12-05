@@ -5,7 +5,7 @@ import 'bookDetails.dart';
 import 'navigation.dart'; 
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';
+const String googleBooksApiKey = 'AIzaSyAOtxByjKg7p_pTnR8ZWk5e88Wh4ROMP7Q';
 
 class BookListWidget extends StatefulWidget {
   @override

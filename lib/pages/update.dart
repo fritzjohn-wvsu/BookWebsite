@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'bookDetails.dart'; 
 
 // Google Books API key
-const String googleBooksApiKey = 'AIzaSyDoVXygeRZe-s07DSFWQFcO5ITv1juwN34';
+const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
 
 Future<List<dynamic>> fetchBooks() async {
   final urls = [
