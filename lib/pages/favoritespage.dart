@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'bookDetails.dart'; // Import BookDetailPage for navigation
+import 'bookDetails.dart';
 
 class FavoriteBooksPage extends StatelessWidget {
   const FavoriteBooksPage({super.key});
@@ -51,14 +52,15 @@ class FavoriteBooksPage extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => BookDetailPage(
-                      title: book['title'],
-                      imageUrl: book['imageUrl'],
-                      description: book['description'],
-                      author: book['author'],
-                      publishedDate: book['publishedDate'],
-                      categories: book['categories'],
-                      printType: book['printType'],
-                      previewLink: book['previewLink'],
+                      bookId: book['id'], // Pass the book ID
+                      title: book['title'] ?? 'No Title',
+                      imageUrl: book['imageUrl'] ?? '',
+                      description: book['description'] ?? 'No Description',
+                      author: book['author'] ?? 'Unknown Author',
+                      publishedDate: book['publishedDate'] ?? 'Unknown',
+                      categories: book['categories'] ?? 'Unknown',
+                      printType: book['printType'] ?? 'Unknown',
+                      previewLink: book['previewLink'] ?? '',
                     ),
                   ),
                 );

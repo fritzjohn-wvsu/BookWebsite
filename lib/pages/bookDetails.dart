@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookDetailPage extends StatefulWidget {
   final String bookId;
@@ -25,8 +26,6 @@ class BookDetailPage extends StatefulWidget {
     required this.previewLink,
   });
 
-  static List<Map<String, dynamic>> favoriteBooks = [];
-
   @override
   _BookDetailPageState createState() => _BookDetailPageState();
 }
@@ -38,31 +37,52 @@ class _BookDetailPageState extends State<BookDetailPage> {
   @override
   void initState() {
     super.initState();
-    _isFavorite = BookDetailPage.favoriteBooks
-        .any((book) => book['title'] == widget.title);
+    _checkIfFavorite();
   }
 
-  void _toggleFavorite() {
+  // Check if the book is already in Firestore's 'favorites' collection
+  Future<void> _checkIfFavorite() async {
+    final collection = FirebaseFirestore.instance.collection('favorites');
+    final querySnapshot =
+        await collection.where('bookId', isEqualTo: widget.bookId).get();
+
     setState(() {
-      if (_isFavorite) {
-        BookDetailPage.favoriteBooks
-            .removeWhere((book) => book['title'] == widget.title);
-      } else {
-        BookDetailPage.favoriteBooks.add({
-          'title': widget.title,
-          'imageUrl': widget.imageUrl,
-          'description': widget.description,
-          'author': widget.author,
-          'publishedDate': widget.publishedDate,
-          'categories': widget.categories,
-          'printType': widget.printType,
-          'previewLink': widget.previewLink,
-        });
-      }
-      _isFavorite = !_isFavorite;
+      _isFavorite = querySnapshot.docs.isNotEmpty;
     });
   }
 
+  // Toggle favorite status and update Firestore
+  Future<void> _toggleFavorite() async {
+    final collection = FirebaseFirestore.instance.collection('favorites');
+
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+
+    if (_isFavorite) {
+      // Add book to Firestore
+      await collection.add({
+        'bookId': widget.bookId,
+        'title': widget.title,
+        'imageUrl': widget.imageUrl,
+        'description': widget.description,
+        'author': widget.author,
+        'publishedDate': widget.publishedDate,
+        'categories': widget.categories,
+        'printType': widget.printType,
+        'previewLink': widget.previewLink,
+      });
+    } else {
+      // Remove book from Firestore
+      final querySnapshot =
+          await collection.where('bookId', isEqualTo: widget.bookId).get();
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+    }
+  }
+
+  // Launch preview link
   Future<void> _launchPreviewLink() async {
     if (await canLaunch(widget.previewLink)) {
       await launch(widget.previewLink);
@@ -84,12 +104,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(100),
+        padding: const EdgeInsets.all(20.0),
         child: Row(
-          crossAxisAlignment:
-              CrossAxisAlignment.start, // Align the content properly
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left side: Image
             ClipRRect(
               borderRadius: BorderRadius.circular(16),
               child: Container(
@@ -103,8 +121,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
               ),
             ),
             const SizedBox(width: 30),
-
-            // Right side: Book Details
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,12 +157,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
                             color: Colors.white,
                             fontSize: 16,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
-
-                  // Description above the author, published, genre, and print type
                   const SizedBox(height: 20),
                   const Text(
                     "Synopsis",
@@ -185,89 +199,67 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Author and Published Date in one row
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         'Author: ',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       Text(
                         widget.author,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold, // Make the author bold
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(width: 30),
-                      Text(
+                      const Text(
                         'Published: ',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       Text(
                         widget.publishedDate,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight:
-                              FontWeight.bold, // Make the published date bold
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Genre and Print Type in one row
                   Row(
                     children: [
-                      Text(
+                      const Text(
                         'Genre: ',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       Text(
                         widget.categories,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight: FontWeight.bold, // Make the genre bold
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(width: 30),
-                      Text(
+                      const Text(
                         'Print Type: ',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 16),
                       ),
                       Text(
                         widget.printType,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          fontWeight:
-                              FontWeight.bold, // Make the print type bold
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-
-                  // Preview Link
                   const Text(
                     'Preview Link:',
                     style: TextStyle(

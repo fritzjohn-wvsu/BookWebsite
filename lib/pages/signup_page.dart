@@ -227,7 +227,8 @@ class _HomePageState extends State<SignUp> {
                   label: 'Password',
                   hint: 'Enter your password',
                   icon: const Icon(Icons.lock, color: Color(0xffe3eed4)),
-                  obscureText: true,
+                  obscureText:
+                      !_isPasswordVisible, // Update obscureText to use _isPasswordVisible
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
@@ -243,13 +244,13 @@ class _HomePageState extends State<SignUp> {
                   ),
                   validator: validatePassword,
                 ),
-                const SizedBox(height: 20),
                 buildTextField(
                   controller: _confirmPasswordController,
                   label: 'Confirm Password',
                   hint: 'Confirm your password',
                   icon: const Icon(Icons.check, color: Color(0xffe3eed4)),
-                  obscureText: true,
+                  obscureText:
+                      !_isConfirmPasswordVisible, // Update obscureText to use _isConfirmPasswordVisible
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isConfirmPasswordVisible

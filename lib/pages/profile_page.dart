@@ -35,10 +35,12 @@ class _ProfilePageState extends State<ProfilePage> {
             await _firestore.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
           setState(() {
-            username = userDoc['username'] ?? '';
-            email = userDoc['email'] ?? '';
+            username = userDoc['username'] ?? 'No username found';
+            email = userDoc['email'] ?? 'No email found';
             favoriteBooks = List<String>.from(userDoc['favorite_books'] ?? []);
           });
+        } else {
+          print('No such document found for the user');
         }
       } catch (e) {
         // Handle any errors while fetching data
