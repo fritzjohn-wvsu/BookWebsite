@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'search.dart'; 
+import 'search.dart';
 import 'package:main/pages/route_manager.dart';
+import 'favoritespage.dart'; // Import FavoriteBooksPage
 
 Widget navigationBar(BuildContext context) {
   final TextEditingController searchController = TextEditingController();
@@ -44,7 +45,7 @@ Widget navigationBar(BuildContext context) {
     child: Padding(
       padding: const EdgeInsets.only(left: 25, right: 25),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center, // Align all elements to the center
         children: [
           GestureDetector(
             onTap: () {
@@ -76,8 +77,9 @@ Widget navigationBar(BuildContext context) {
               ],
             ),
           ),
-          // Search bar and Profile icon
+          // Search bar and Profile icon with dropdown
           Row(
+            mainAxisAlignment: MainAxisAlignment.center, // Align profile icon with others
             children: [
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -121,16 +123,57 @@ Widget navigationBar(BuildContext context) {
                 ),
               ),
               const SizedBox(width: 10),
-              // Profile Icon
-              IconButton(
+              // Profile Icon with Dropdown Menu and Favorite Icon
+              PopupMenuButton<String>(
                 icon: const Icon(
                   Icons.account_circle,
                   size: 45,
                   color: Color(0xffe3eed4),
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login'); 
+                onSelected: (value) {
+                  if (value == 'login') {
+                    Navigator.pushNamed(context, '/login');
+                  }
+                  // Navigate to the Favorites page
+                  if (value == 'favorites') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FavoriteBooksPage()),
+                    );
+                  }
                 },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'login',
+                    child: Row(
+                      children: [
+                        Icon(Icons.login, color: Color.fromARGB(255, 0, 15, 22)),
+                        SizedBox(width: 8),
+                        Text(
+                          'Log in',
+                          style: TextStyle(color: Color.fromARGB(255, 0, 15, 22)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'favorites',
+                    child: Row(
+                      children: [
+                        Icon(Icons.favorite, color: Color.fromARGB(255, 0, 15, 22)),
+                        SizedBox(width: 8),
+                        Text(
+                          'Favorites',
+                          style: TextStyle(color: Color.fromARGB(255, 0, 15, 22)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                color: const Color(0xffe3eed4), // Set dropdown background color
+                elevation: 4, // Optional, adds shadow to the dropdown
+                padding: const EdgeInsets.only(top: 10), // Adjust padding to prevent covering the icon
+                constraints: BoxConstraints(maxWidth: 250), // Set maximum width for dropdown
               ),
             ],
           ),

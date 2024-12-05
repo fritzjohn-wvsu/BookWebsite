@@ -349,7 +349,8 @@ void sortBooks() {
                                       sortBooks(); // Re-sort the books when a new option is selected
                                     });
                                   },
-                                  dropdownColor: const Color(0xff1c2a36),
+                                  dropdownColor: const Color(0xff293d3e),
+                                  borderRadius: BorderRadius.circular(24),
                                   style: const TextStyle(color: Color(0xffe3eed4)),
 
                                       icon: const Icon(

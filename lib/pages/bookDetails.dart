@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'favoritespage.dart'; // Import the FavoriteBooksPage
 
 class BookDetailPage extends StatefulWidget {
   final String title;
@@ -69,6 +70,14 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }
   }
 
+  // Navigation method to go to the FavoriteBooksPage
+  void _navigateToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FavoriteBooksPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +88,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
           style: TextStyle(color: Color(0xffe3eed4)),
         ),
         backgroundColor: const Color.fromARGB(255, 0, 15, 22),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Color(0xffe3eed4)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -127,7 +136,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                 IconButton(
                                   icon: Icon(
                                     _isFavorite ? Icons.favorite : Icons.favorite_border,
-                                    color: _isFavorite ? Colors.red : Colors.white,
+                                    color: _isFavorite ? Color(0xffe3eed4) : Color(0xffe3eed4),
                                   ),
                                   onPressed: _toggleFavorite,
                                 ),
@@ -239,4 +248,3 @@ class _BookDetailPageState extends State<BookDetailPage> {
     );
   }
 }
-
