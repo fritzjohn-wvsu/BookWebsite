@@ -1,203 +1,220 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'bookDetails.dart';
 
-Widget updateList() {
-  return Center(
-    child: SingleChildScrollView(
-      // Wrap the whole container in a scroll view
-      child: Container(
-        width: 1450,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 0, 15, 22),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Latest Updates Title (Aligned to the left)
-            const Text(
-              "Latest Updates",
-              style: TextStyle(
-                fontSize: 30,
-                color: Color(0xffe3eed4),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Divider(
-              color: Color(0xffe3eed4),
-              thickness: 1,
-              height: 20,
-            ),
-            const SizedBox(height: 10),
-            // Row with two book details spaced evenly
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly, // Space items evenly
-              children: [
-                _bookDetailWithImage('Book 1'),
-                _bookDetailWithImage('Book 2'),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Row with Book 3 and Book 4
-            Row(
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly, // Space items evenly
-              children: [
-                _bookDetailWithImage('Book 3'),
-                _bookDetailWithImage('Book 4'),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Center the "View all Updates" container below Book 3 and Book 4
-            Center(
-              child: Container(
-                alignment:
-                    Alignment.center, // Align the content inside the container
-                width: 350, // Resized width
-                height: 50, // Resized height
-                margin: const EdgeInsets.only(
-                    bottom: 15), // Inset left margin handled at the row level
-                decoration: BoxDecoration(
-                  color: const Color(0xffc1d5e0),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  "View all Updates",
-                  style: TextStyle(
-                    color: Color(0xff000000),
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
+// Google Books API key
+const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
+
+Future<List<dynamic>> fetchBooks() async {
+  final urls = [
+    'https://www.googleapis.com/books/v1/volumes?q=fiction&key=$googleBooksApiKey',
+    'https://www.googleapis.com/books/v1/volumes?q=non+fiction&key=$googleBooksApiKey',
+  ];
+
+  List<dynamic> allBooks = [];
+
+  try {
+    final responses = await Future.wait(
+      urls.map((url) async {
+        final response = await http.get(Uri.parse(url));
+        return response;
+      }),
+    );
+
+    for (var response in responses) {
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final items = data['items'] ?? [];
+
+        for (var item in items) {
+          allBooks.add(item);
+        }
+      } else {
+        debugPrint('Error fetching books: ${response.statusCode}');
+      }
+    }
+
+    // Sort books by the publication date in descending order
+    allBooks.sort((a, b) {
+      final dateA = a['volumeInfo']['publishedDate'] ?? '';
+      final dateB = b['volumeInfo']['publishedDate'] ?? '';
+      return dateB.compareTo(dateA); // Descending order by date
+    });
+
+    // Limit to only the 10 latest books
+    return allBooks.take(10).toList();
+  } catch (e) {
+    debugPrint('Error fetching books: $e');
+    return [];
+  }
 }
 
-Widget _bookDetailWithImage(String bookName) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center, // Center items in the row
-        children: [
-          // Book Image Rectangle
-          Container(
-            width: 200,
-            height: 300,
+Widget bookRectangle(
+    BuildContext context, // Accept context here
+    String bookName,
+    String? imageUrl,
+    String description,
+    String author,
+    String publishedDate,
+    String categories,
+    String printType,
+    String previewLink) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context, // Use the passed context
+        MaterialPageRoute(
+          builder: (context) => BookDetailPage(
+            title: bookName,
+            imageUrl: imageUrl,
+            description: description,
+            author: author,
+            publishedDate: publishedDate,
+            categories: categories,
+            printType: printType,
+            previewLink: previewLink,
+          ),
+        ),
+      );
+    },
+    child: Column(
+      children: [
+        // Book Image
+        Container(
+          width: 200,
+          height: 300,
+          decoration: BoxDecoration(
             color: const Color(0xffe3eed4),
-            child: const Icon(
-              Icons.image,
-              color: Colors.black,
-              size: 80,
-            ),
+            borderRadius: BorderRadius.circular(10),
+            image: imageUrl != null
+                ? DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
+                  )
+                : null,
           ),
-          const SizedBox(width: 20), // Adjusted width between image and text
-          // Book Details Rectangle with padding inside
-          Container(
-            width: 400,
-            height: 300,
-            padding: const EdgeInsets.all(
-                12), // Add padding inside the description rectangle
-            decoration: BoxDecoration(
-              color: const Color(0xffe3eed4),
-              borderRadius: BorderRadius.circular(10),
+        ),
+        const SizedBox(height: 8),
+        // Book Title
+        SizedBox(
+          width: 200,
+          child: Text(
+            bookName,
+            style: const TextStyle(
+              color: Color(0xffe3eed4),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.none,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Book Title (Left-aligned)
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 3),
-                  child: Text(
-                    bookName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xff000000),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Row with rating, star, and ongoing status (no space between elements)
-                const Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 20), // Added left padding
-                      child: Text(
-                        '10',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff000000),
-                        ),
-                      ),
-                    ),
-                    Icon(
-                      Icons.star,
-                      color: Colors.yellow,
-                      size: 15,
-                    ),
-                    Spacer(), // Spacer to push the 'Ongoing' text to the right
-                    Padding(
-                      padding:
-                          EdgeInsets.only(right: 15), // Adjust right padding
-                      child: Text(
-                        'Ongoing',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xff000000),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                // List of Chapter Rectangles inside the book details (Resize chapters)
-                Center(
-                  // Center the chapter rectangles
-                  child: Column(
-                    children: [
-                      _chapterRectangle('Chapter 1'),
-                      _chapterRectangle('Chapter 2'),
-                      _chapterRectangle('View All'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
-        ],
-      ),
-      const SizedBox(height: 20),
-    ],
+        ),
+        // Publication Date on a new line
+        SizedBox(
+          width: 200,
+          child: Text(
+            '($publishedDate)', // Date in parentheses
+            style: const TextStyle(
+              color: Color(0xffe3eed4),
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+              decoration: TextDecoration.none,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    ),
   );
 }
 
-Widget _chapterRectangle(String chapterName) {
-  return Container(
-    width: 350, // Resized width
-    height: 50, // Resized height
-    margin: const EdgeInsets.only(
-        bottom: 15), // Inset left margin handled at the row level
-    decoration: BoxDecoration(
-      color: const Color(0xffc1d5e0),
-      borderRadius: BorderRadius.circular(20),
+Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {
+  // Pass context here
+  return GridView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 5, // 5 items per row
+      crossAxisSpacing: 20.0, // Horizontal space
+      mainAxisSpacing: 10.0, // Vertical space
+      childAspectRatio: 200 / 300, // Width to height ratio
     ),
-    alignment: Alignment.center,
-    child: Text(
-      chapterName,
-      style: const TextStyle(
-        color: Color(0xff000000),
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
+    itemCount: bookList.length,
+    itemBuilder: (context, index) {
+      final volumeInfo = bookList[index]['volumeInfo'];
+      final title = volumeInfo['title'] ?? 'Unknown Title';
+      final imageUrl = volumeInfo['imageLinks']?['thumbnail'];
+      final description =
+          volumeInfo['description'] ?? 'No description available';
+      final author =
+          volumeInfo['authors'] != null && volumeInfo['authors'].isNotEmpty
+              ? volumeInfo['authors'][0]
+              : 'Unknown Author';
+      final publishedDate = volumeInfo['publishedDate'] ?? 'Unknown Date';
+      final categories = volumeInfo['categories'] != null &&
+              volumeInfo['categories'].isNotEmpty
+          ? volumeInfo['categories'].join(', ')
+          : 'No categories available';
+      final printType = volumeInfo['printType'] ?? 'Unknown';
+      final previewLink = volumeInfo['previewLink'] ?? '';
+
+      return bookRectangle(
+        context, // Pass context here
+        title,
+        imageUrl,
+        description,
+        author,
+        publishedDate,
+        categories,
+        printType,
+        previewLink,
+      );
+    },
+  );
+}
+
+Widget updateList(BuildContext context) {
+  return FutureBuilder<List<dynamic>>(
+    future: fetchBooks(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (snapshot.hasError) {
+        return const Center(child: Text('Error fetching books'));
+      }
+
+      final books = snapshot.data ?? [];
+
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(40.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Latest Updates",
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Color(0xffe3eed4),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const Divider(
+                color: Color(0xffe3eed4),
+                thickness: 1,
+                height: 20,
+              ),
+              const SizedBox(height: 25),
+              buildBookGrid(books, context), // Pass context to buildBookGrid
+            ],
+          ),
+        ),
+      );
+    },
   );
 }

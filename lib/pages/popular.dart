@@ -1,118 +1,183 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:math'; 
+import 'bookDetails.dart'; 
 
-Widget popularBook() {
-  return Center(
-    child: SingleChildScrollView(
-      // Wrap the whole container in a scroll view to allow scrolling
-      child: Container(
-        width: 1450,
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(
-              255, 0, 15, 22), // Background color for the section
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Popular Today Title
-            const Text(
-              "Popular Today",
-              style: TextStyle(
-                fontSize: 30,
-                color: Color(0xffe3eed4),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            // Divider line under the title
-            const Divider(
-              color: Color(0xffe3eed4), // Color of the line
-              thickness: 1, // Thickness of the line
-              height: 20, // Space between the text and the line
-            ),
-            const SizedBox(
-              height: 25,
-            ),
-            // Row of small rectangles with text below (Books 1 to 5)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _bookRectangle('Book 1'),
-                _bookRectangle('Book 2'),
-                _bookRectangle('Book 3'),
-                _bookRectangle('Book 4'),
-                _bookRectangle('Book 5'),
-              ],
-            ),
-            const SizedBox(
-              height: 25,
-            ), // Row of small rectangles with text below (Books 6 to 10)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _bookRectangle('Book 6'),
-                _bookRectangle('Book 7'),
-                _bookRectangle('Book 8'),
-                _bookRectangle('Book 9'),
-                _bookRectangle('Book 10'),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
+// Your Google Books API key
+const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
+
+// Fetch books from Google Books API
+Future<List<dynamic>> fetchBooks() async {
+  final urls = [
+    'https://www.googleapis.com/books/v1/volumes?q=fiction&key=$googleBooksApiKey',
+    'https://www.googleapis.com/books/v1/volumes?q=non+fiction&key=$googleBooksApiKey',
+  ];
+
+  try {
+    final responses = await Future.wait(
+      urls.map((url) async {
+        final response = await http.get(Uri.parse(url));
+        return response;
+      }),
+    );
+//fetch the books
+    List<dynamic> allBooks = [];
+
+    for (var response in responses) {
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final items = data['items'] ?? [];
+        allBooks.addAll(items);
+      } else {
+        debugPrint('Error fetching books: ${response.statusCode}');
+      }
+    }
+
+    // Randomize the list of books
+    allBooks.shuffle(Random());
+
+    // Return only the first 5 books
+    return allBooks.take(5).toList();
+  } catch (e) {
+    debugPrint('Error fetching books: $e');
+    return [];
+  }
 }
 
-// Helper widget to create a rectangle for each book
-Widget _bookRectangle(String bookName) {
-  return Column(
-    children: [
-      Container(
-        width: 200,
-        height: 300,
-        color: const Color(0xffe3eed4),
-      ),
-      // Book name below the image
-      Text(
-        bookName,
-        style: const TextStyle(
-          color: Color(0xffe3eed4),
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      // Row for the review number, star icon, and ongoing status
-      const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Number of reviews
-          Text(
-            '10',
-            style: TextStyle(
-              color: Color(0xffe3eed4),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+Widget popularBook() {
+  return FutureBuilder<List<dynamic>>(
+    future: fetchBooks(), // Fetch books asynchronously
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text('No books found.'));
+      } else {
+        final books = snapshot.data!;
+
+        return Center(
+          child: SingleChildScrollView(
+            child: Container(
+              width: 1450,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 0, 15, 22),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Popular Today",
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Color(0xffe3eed4),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Divider(
+                    color: Color(0xffe3eed4),
+                    thickness: 1,
+                    height: 20,
+                  ),
+                  const SizedBox(height: 25),
+                  // Display the books in a grid
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 5,
+                      crossAxisSpacing: 20.0,
+                      mainAxisSpacing: 10.0,
+                      childAspectRatio: 200 / 300,
+                    ),
+                    itemCount: books.length, // get all the description
+                    itemBuilder: (context, index) {
+                      final volumeInfo = books[index]['volumeInfo'];
+                      final title = volumeInfo['title'] ?? 'Unknown Title';
+                      final imageUrl = volumeInfo['imageLinks']?['thumbnail'];
+                      final description = volumeInfo['description'] ??
+                          'No description available';
+                      final author = volumeInfo['authors'] != null &&
+                              volumeInfo['authors'].isNotEmpty
+                          ? volumeInfo['authors'][0]
+                          : 'Unknown Author';
+                      final publishedDate =
+                          volumeInfo['publishedDate'] ?? 'Unknown Date';
+                      final categories = volumeInfo['categories'] != null &&
+                              volumeInfo['categories'].isNotEmpty
+                          ? volumeInfo['categories'].join(', ')
+                          : 'No categories available';
+                      final printType = volumeInfo['printType'] ?? 'Unknown';
+                      final previewLink = volumeInfo['previewLink'] ?? '';
+
+                      // Gesture to navigate to the details page
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BookDetailPage(
+                                title: title,
+                                imageUrl: imageUrl,
+                                description: description,
+                                author: author,
+                                publishedDate: publishedDate,
+                                categories: categories,
+                                printType: printType,
+                                previewLink: previewLink,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            // Book Image
+                            Container(
+                              width: 200,
+                              height: 300,
+                              decoration: BoxDecoration(
+                                color: const Color(0xffe3eed4),
+                                borderRadius: BorderRadius.circular(10),
+                                image: imageUrl != null
+                                    ? DecorationImage(
+                                        image: NetworkImage(imageUrl),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // Book Title
+                            SizedBox(
+                              width: 200,
+                              child: Text(
+                                title,
+                                style: const TextStyle(
+                                  color: Color(0xffe3eed4),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.none,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-          SizedBox(width: 5),
-          // Star icon
-          Icon(
-            Icons.star,
-            color: Colors.yellow,
-            size: 16,
-          ),
-          SizedBox(width: 100),
-          // Ongoing text
-          Text(
-            'Ongoing',
-            style: TextStyle(
-              color: Color(0xffe3eed4),
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    ],
+        );
+      }
+    },
   );
 }
