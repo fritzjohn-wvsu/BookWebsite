@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'favoritespage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class BookDetailPage extends StatefulWidget {
-  final String bookId;
   final String title;
   final String imageUrl;
   final String description;
@@ -15,7 +16,6 @@ class BookDetailPage extends StatefulWidget {
 
   const BookDetailPage({
     super.key,
-    required this.bookId,
     required this.title,
     required this.imageUrl,
     required this.description,
@@ -33,18 +33,26 @@ class BookDetailPage extends StatefulWidget {
 class _BookDetailPageState extends State<BookDetailPage> {
   bool _isExpanded = false;
   bool _isFavorite = false;
+  String? userEmail;
 
   @override
   void initState() {
     super.initState();
-    _checkIfFavorite();
+    userEmail = FirebaseAuth.instance.currentUser?.email;
+    if (userEmail != null) {
+      _checkIfFavorite();
+    }
   }
 
-  // Check if the book is already in Firestore's 'favorites' collection
+  // Check if the book is already in the user's favorites collection in Firestore
   Future<void> _checkIfFavorite() async {
+    if (userEmail == null) return;
+
     final collection = FirebaseFirestore.instance.collection('favorites');
-    final querySnapshot =
-        await collection.where('bookId', isEqualTo: widget.bookId).get();
+    final querySnapshot = await collection
+        .where('email', isEqualTo: userEmail)
+        .where('title', isEqualTo: widget.title)
+        .get();
 
     setState(() {
       _isFavorite = querySnapshot.docs.isNotEmpty;
@@ -52,17 +60,24 @@ class _BookDetailPageState extends State<BookDetailPage> {
   }
 
   // Toggle favorite status and update Firestore
-  Future<void> _toggleFavorite() async {
+  void _toggleFavorite() async {
+    if (userEmail == null) return;
+
     final collection = FirebaseFirestore.instance.collection('favorites');
-
-    setState(() {
-      _isFavorite = !_isFavorite;
-    });
-
     if (_isFavorite) {
-      // Add book to Firestore
+      // Remove from Firestore if already a favorite
+      final querySnapshot = await collection
+          .where('email', isEqualTo: userEmail)
+          .where('title', isEqualTo: widget.title)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        await doc.reference.delete();
+      }
+    } else {
+      // Add to Firestore as a favorite
       await collection.add({
-        'bookId': widget.bookId,
+        'email': userEmail,
         'title': widget.title,
         'imageUrl': widget.imageUrl,
         'description': widget.description,
@@ -72,23 +87,29 @@ class _BookDetailPageState extends State<BookDetailPage> {
         'printType': widget.printType,
         'previewLink': widget.previewLink,
       });
-    } else {
-      // Remove book from Firestore
-      final querySnapshot =
-          await collection.where('bookId', isEqualTo: widget.bookId).get();
-      for (var doc in querySnapshot.docs) {
-        await doc.reference.delete();
-      }
     }
+
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
   }
 
   // Launch preview link
   Future<void> _launchPreviewLink() async {
-    if (await canLaunch(widget.previewLink)) {
-      await launch(widget.previewLink);
+    final Uri url = Uri.parse(widget.previewLink);
+    if (await canLaunch(url.toString())) {
+      await launch(url.toString());
     } else {
       throw 'Could not open preview link';
     }
+  }
+
+  // Navigation method to go to the FavoriteBooksPage
+  void _navigateToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FavoriteBooksPage()),
+    );
   }
 
   @override
@@ -104,7 +125,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.only(top: 50.0, left: 100, right: 100),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -147,7 +168,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                 : Icons.favorite_border,
                             color: _isFavorite ? Colors.red : Colors.white,
                           ),
-                          onPressed: _toggleFavorite,
+                          onPressed:
+                              _toggleFavorite, // Always toggle regardless of state
                         ),
                         Text(
                           _isFavorite

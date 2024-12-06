@@ -1,3 +1,5 @@
+import 'package:main/pages/favoritespage.dart';
+
 import '/pages/about.dart';
 import '/pages/booklist.dart';
 import 'pages/login_page.dart';
@@ -40,6 +42,7 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => ProfilePage(),
         '/about': (context) => About(),
         '/books': (context) => BookListWidget(),
+        '/favorite': (context) => FavoriteBooksPage()
       },
     );
   }

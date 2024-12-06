@@ -99,7 +99,6 @@ Widget popularBook() {
                     itemBuilder: (context, index) {
                       final book = books[index];
                       final volumeInfo = book['volumeInfo'];
-                      final bookId = book['id'] ?? 'Unknown ID'; // Fixed
                       final title = volumeInfo['title'] ?? 'Unknown Title';
                       final imageUrl = volumeInfo['imageLinks']?['thumbnail'];
                       final description = volumeInfo['description'] ??
@@ -120,26 +119,45 @@ Widget popularBook() {
                       // Gesture to navigate to the details page
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BookDetailPage(
-                                bookId: bookId, // Pass the book ID
-                                title: title,
-                                imageUrl: imageUrl,
-                                description: description,
-                                author: author,
-                                publishedDate: publishedDate,
-                                categories: categories,
-                                printType: printType,
-                                previewLink: previewLink,
+                          // Ensure the imageUrl is valid before navigating
+                          if (imageUrl != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookDetailPage(
+                                  title: title,
+                                  imageUrl: imageUrl,
+                                  description: description,
+                                  author: author,
+                                  publishedDate: publishedDate,
+                                  categories: categories,
+                                  printType: printType,
+                                  previewLink: previewLink,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            // Handle case where there's no image
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookDetailPage(
+                                  title: title,
+                                  imageUrl: 'no_image',
+                                  description: description,
+                                  author: author,
+                                  publishedDate: publishedDate,
+                                  categories: categories,
+                                  printType: printType,
+                                  previewLink: previewLink,
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: Column(
                           children: [
-                            // Book Image
+                            // Book Image or Placeholder
                             Container(
                               width: 200,
                               height: 300,
@@ -155,7 +173,14 @@ Widget popularBook() {
                               ),
                               child: imageUrl == null
                                   ? const Center(
-                                      child: Icon(Icons.book, size: 60),
+                                      child: Text(
+                                        'No Image Found',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     )
                                   : null,
                             ),

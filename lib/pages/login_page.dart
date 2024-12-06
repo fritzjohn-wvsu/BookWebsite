@@ -46,12 +46,26 @@ class _LoginState extends State<LoginPage> {
         // Successful login
         if (userCredential.user != null) {
           // Show success dialog
-          _showDialog("You have Successfully!",
-              "Logged in as ${userCredential.user!.email}", true);
+          _showDialog(
+              "Login Successful!",
+              "You successfully login your account ${userCredential.user!.email}",
+              true);
+        }
+      } on FirebaseAuthException catch (e) {
+        // Handle Firebase Auth errors
+        if (e.code == 'user-not-found') {
+          _showDialog(
+              "Login Failed", "No user found with this email address.", false);
+        } else if (e.code == 'wrong-password') {
+          _showDialog("Login Failed", "Incorrect password entered.", false);
+        } else {
+          _showDialog("Login Failed",
+              "The email address or password you entered is incorrect.", false);
         }
       } catch (e) {
-        // Error during sign-in (e.g. wrong credentials)
-        _showDialog("Login Failed", "Error: ${e.toString()}", false);
+        // Catch all other errors
+        _showDialog("Login Failed",
+            "The email address or password you entered is incorrect.", false);
       }
     }
   }
@@ -63,7 +77,15 @@ class _LoginState extends State<LoginPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(title),
-          content: Text(message),
+          content: Container(
+            width: 400, // Set fixed width for the content
+            height: 30, // Set fixed height for the content
+            child: Column(
+              children: [
+                Text(message),
+              ],
+            ),
+          ),
           actions: <Widget>[
             TextButton(
               child: Text("OK"),
@@ -164,7 +186,7 @@ class _LoginState extends State<LoginPage> {
               const SizedBox(height: 35),
               // Login Button
               SizedBox(
-                width: 200,
+                width: 500,
                 child: ElevatedButton(
                   onPressed: _signIn,
                   style: ElevatedButton.styleFrom(

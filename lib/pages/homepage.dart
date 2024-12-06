@@ -46,7 +46,7 @@ class _HomepageState extends State<Homepage> {
             left: 0,
             right: 0,
             child: Container(
-              child: navigationBar(context),
+              child: navigationBar(),
             ),
           ),
         ],

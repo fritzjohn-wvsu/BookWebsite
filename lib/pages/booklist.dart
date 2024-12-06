@@ -129,7 +129,6 @@ class _BookListWidgetState extends State<BookListWidget> {
           context,
           MaterialPageRoute(
             builder: (context) => BookDetailPage(
-              bookId: book['id'] ?? 'Unknown ID',
               title: title,
               imageUrl: imageUrl,
               description: volumeInfo['description'] ?? 'No description',
@@ -200,7 +199,7 @@ class _BookListWidgetState extends State<BookListWidget> {
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: Column(
         children: [
-          navigationBar(context),
+          navigationBar(),
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())

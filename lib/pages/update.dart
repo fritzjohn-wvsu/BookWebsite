@@ -64,7 +64,6 @@ Widget bookRectangle(
         context,
         MaterialPageRoute(
           builder: (context) => BookDetailPage(
-            bookId: bookId,
             title: bookName,
             imageUrl: imageUrl ??
                 'https://via.placeholder.com/150', // Default image if null

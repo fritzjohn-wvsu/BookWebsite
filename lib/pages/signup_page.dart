@@ -3,7 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '/pages/homepage.dart';
 
 final _formKey = GlobalKey<FormState>();
 
@@ -15,10 +14,10 @@ class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _HomePageState extends State<SignUp> {
+class _SignUpState extends State<SignUp> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -48,7 +47,6 @@ class _HomePageState extends State<SignUp> {
       return 'Username is required';
     }
     if (username.length < 5) {
-      // This ensures the username is at least 5 characters
       return 'Username must be at least 5 characters';
     }
     return null;
@@ -74,41 +72,37 @@ class _HomePageState extends State<SignUp> {
     return null;
   }
 
-  // Function to handle sign up
   Future<void> _signUp() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Create user with email and password
         UserCredential userCredential =
             await _auth.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
         );
 
-        // Store user data (username, email, and created_at timestamp) in Firestore
         await _firestore.collection('users').doc(userCredential.user!.uid).set({
           'username': _usernameController.text.trim(),
           'email': _emailController.text.trim(),
-          'created_at': FieldValue.serverTimestamp(), // Add timestamp here
+          'created_at': FieldValue.serverTimestamp(),
         });
 
-        // Show success dialog
-        _showDialog(context, 'Success', 'Account created successfully!');
+        await _showDialog(context, 'Success', 'Account created successfully!');
 
-        // Navigate to Login page after success
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } catch (e) {
-        _showDialog(context, 'Error', 'Failed to create account: $e');
+        _showDialog(context, 'Error',
+            'Failed to create account: The username or email address is already in use by another account.');
       }
     }
   }
 
-  // Function to show a dialog
-  void _showDialog(BuildContext context, String title, String message) {
-    showDialog(
+  Future<void> _showDialog(
+      BuildContext context, String title, String message) async {
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -127,7 +121,6 @@ class _HomePageState extends State<SignUp> {
     );
   }
 
-  // Helper function to build TextFormField
   Widget buildTextField({
     required TextEditingController controller,
     required String label,
@@ -166,21 +159,6 @@ class _HomePageState extends State<SignUp> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 229, 233, 236),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xffe3eed4)),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Homepage(),
-              ),
-            );
-          },
-        ),
-      ),
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: SingleChildScrollView(
         child: Padding(
@@ -227,8 +205,7 @@ class _HomePageState extends State<SignUp> {
                   label: 'Password',
                   hint: 'Enter your password',
                   icon: const Icon(Icons.lock, color: Color(0xffe3eed4)),
-                  obscureText:
-                      !_isPasswordVisible, // Update obscureText to use _isPasswordVisible
+                  obscureText: !_isPasswordVisible,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isPasswordVisible
@@ -244,13 +221,13 @@ class _HomePageState extends State<SignUp> {
                   ),
                   validator: validatePassword,
                 ),
+                const SizedBox(height: 20),
                 buildTextField(
                   controller: _confirmPasswordController,
                   label: 'Confirm Password',
                   hint: 'Confirm your password',
                   icon: const Icon(Icons.check, color: Color(0xffe3eed4)),
-                  obscureText:
-                      !_isConfirmPasswordVisible, // Update obscureText to use _isConfirmPasswordVisible
+                  obscureText: !_isConfirmPasswordVisible,
                   suffixIcon: IconButton(
                     icon: Icon(
                       _isConfirmPasswordVisible
@@ -268,7 +245,7 @@ class _HomePageState extends State<SignUp> {
                 ),
                 const SizedBox(height: 20),
                 SizedBox(
-                  width: 200,
+                  width: 500,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 25),
@@ -290,36 +267,41 @@ class _HomePageState extends State<SignUp> {
                 ),
                 const SizedBox(height: 20),
                 const Text(
-                  "Or Sign In with",
-                  style: TextStyle(
-                    color: Color(0xffe3eed4),
-                    fontSize: 12,
-                  ),
+                  "Or sign up with",
+                  style: TextStyle(color: Color(0xffe3eed4)),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: FaIcon(
+                      onPressed: () {
+                        // Add Facebook sign-in logic here
+                      },
+                      icon: const Icon(
                         FontAwesomeIcons.facebook,
-                        color: const Color(0xffe3eed4),
+                        color: Color(0xffe3eed4),
                       ),
-                      onPressed: () {},
                     ),
+                    const SizedBox(width: 20),
                     IconButton(
-                      icon: FaIcon(
-                        FontAwesomeIcons.twitter,
-                        color: const Color(0xffe3eed4),
-                      ),
-                      onPressed: () {},
-                    ),
-                    IconButton(
-                      icon: FaIcon(
+                      onPressed: () {
+                        // Add Google sign-in logic here
+                      },
+                      icon: const Icon(
                         FontAwesomeIcons.google,
-                        color: const Color(0xffe3eed4),
+                        color: Color(0xffe3eed4),
                       ),
-                      onPressed: () {},
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      onPressed: () {
+                        // Add Twitter sign-in logic here
+                      },
+                      icon: const Icon(
+                        FontAwesomeIcons.twitter,
+                        color: Color(0xffe3eed4),
+                      ),
                     ),
                   ],
                 ),
@@ -328,25 +310,24 @@ class _HomePageState extends State<SignUp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Already have an account?",
+                      'Already have an account?',
                       style: TextStyle(color: Color(0xffe3eed4)),
                     ),
                     TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                        );
+                      },
                       child: const Text(
-                        'Log In',
+                        'Login',
                         style: TextStyle(
                           color: Color(0xffe3eed4),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
-                        );
-                      },
                     ),
                   ],
                 ),

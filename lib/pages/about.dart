@@ -22,7 +22,7 @@ class _AboutState extends State<About> {
         child: Column(
           children: [
             // Include the navigation bar at the top
-            navigationBar(context),
+            navigationBar(),
             // The rest of the page content
             Center(
               child: Container(

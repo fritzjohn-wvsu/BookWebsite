@@ -108,8 +108,6 @@ class _SearchPageState extends State<SearchPage> {
                                   MaterialPageRoute(
                                     //go to bookdetailpage
                                     builder: (context) => BookDetailPage(
-                                      bookId: book['id'] ??
-                                          'Unknown ID', // Pass the book ID
                                       title: book['title'] ?? 'No Title',
                                       imageUrl: book['imageLinks']
                                           ?['thumbnail'],
@@ -160,7 +158,7 @@ class _SearchPageState extends State<SearchPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: navigationBar(context),
+            child: navigationBar(),
           ),
         ],
       ),

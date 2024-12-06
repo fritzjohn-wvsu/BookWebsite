@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
-import 'search.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'route_manager.dart';
+import 'search.dart';
 
-Widget navigationBar(BuildContext context) {
+class navigationBar extends StatefulWidget {
+  @override
+  _NavigationBarState createState() => _NavigationBarState();
+}
+
+class _NavigationBarState extends State<navigationBar> {
   final TextEditingController searchController = TextEditingController();
+  late Future<Map<String, String>> _userInfoFuture;
 
   // Function to style the nav item with active state
   Widget buildNavItem(String title, String routeName) {
@@ -39,104 +47,226 @@ Widget navigationBar(BuildContext context) {
     );
   }
 
-  return Container(
-    color: const Color.fromARGB(255, 0, 15, 22),
-    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-    child: Padding(
-      padding: const EdgeInsets.only(left: 25, right: 25),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () {
-              RouteManager.currentRoute.value = '/homepage';
-              Navigator.pushNamed(context, '/homepage');
+  // Fetch user info from Firestore based on email address
+  Future<Map<String, String>> _getUserInfoFromFirestore(String email) async {
+    final firestoreInstance = FirebaseFirestore.instance;
+    try {
+      // Query Firestore for a user document where the email address matches
+      QuerySnapshot userDocs = await firestoreInstance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (userDocs.docs.isNotEmpty) {
+        var userDoc =
+            userDocs.docs.first; // Assuming one user matches the email
+        String userName =
+            userDoc['username'] ?? 'No name'; // Adjusted field name
+        String emailAddress =
+            userDoc['email'] ?? 'No email'; // Adjusted field name
+        return {'userName': userName, 'emailAddress': emailAddress};
+      } else {
+        throw Exception('No user found with that email address.');
+      }
+    } catch (e) {
+      print('Error fetching user info from Firestore: $e');
+      rethrow;
+    }
+  }
+
+  // Show dropdown menu with user info and logout
+  void _showDropdown(BuildContext context, Offset offset) async {
+    final User? user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return; // If the user is not logged in, do nothing
+    }
+
+    try {
+      // Fetch user information from Firestore using email
+      Map<String, String> userInfo =
+          await _getUserInfoFromFirestore(user.email!);
+
+      // Show the dropdown menu with user info
+      _showMenuWithUserInfo(context, offset, userInfo);
+    } catch (e) {
+      print("Error fetching user info: $e");
+    }
+  }
+
+  // Display user info in the dropdown menu
+  void _showMenuWithUserInfo(
+    BuildContext context,
+    Offset offset,
+    Map<String, String> userInfo,
+  ) {
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy + 40, // Adjust to position the dropdown below the icon
+        0,
+        0,
+      ),
+      items: [
+        PopupMenuItem<String>(
+          height: 50,
+          child: Text('Username: ${userInfo['userName']}'),
+        ),
+        PopupMenuItem<String>(
+          height: 50,
+          child: Text('Email Address: ${userInfo['emailAddress']}'),
+        ),
+        PopupMenuItem<String>(
+          height: 30,
+          child: TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/favorite');
             },
-            child: Row(
+            child: const Text('Favorite Books',
+                style: TextStyle(color: Colors.black)),
+          ),
+        ),
+        PopupMenuItem<String>(
+          enabled: false, // Add space before Logout
+          child: SizedBox(height: 2),
+        ),
+        PopupMenuItem<String>(
+          height: 50,
+          child: Center(
+            child: Container(
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextButton(
+                onPressed: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+      color: const Color(0xFFE3EED4),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      _userInfoFuture = _getUserInfoFromFirestore(user.email!);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color.fromARGB(255, 0, 15, 22),
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 25, right: 25),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            GestureDetector(
+              onTap: () {
+                RouteManager.currentRoute.value = '/homepage';
+                Navigator.pushNamed(context, '/homepage');
+              },
+              child: Row(
+                children: [
+                  Image.asset('assets/icon1.png', width: 50, height: 50),
+                  const SizedBox(width: 10),
+                ],
+              ),
+            ),
+            // Centered nav items
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  buildNavItem('Home', '/homepage'),
+                  const SizedBox(width: 30),
+                  buildNavItem('About', '/about'),
+                  const SizedBox(width: 30),
+                  buildNavItem('Books', '/books'),
+                ],
+              ),
+            ),
+            // Search bar and Profile icon
+            Row(
               children: [
-                Image.asset(
-                  'assets/icon1.png',
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.contain,
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  width: 250,
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      filled: true,
+                      fillColor: Color(0xffe3eed4),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 12.0,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  SearchPage(query: searchController.text),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    onSubmitted: (query) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchPage(query: query),
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 const SizedBox(width: 10),
-              ],
-            ),
-          ),
-          // Centered nav items
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                buildNavItem('Home', '/homepage'),
-                const SizedBox(width: 30),
-                buildNavItem('About', '/about'),
-                const SizedBox(width: 30),
-                buildNavItem('Books', '/books'),
-              ],
-            ),
-          ),
-          // Search bar and Profile icon
-          Row(
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                width: 250,
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Color(0xffe3eed4),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16.0,
-                      vertical: 12.0,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.search,
-                          color: Color.fromARGB(255, 0, 15, 22)),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                SearchPage(query: searchController.text),
-                          ),
-                        );
-                      },
+                // Profile Icon with dropdown near the icon
+                GestureDetector(
+                  onTapDown: (details) {
+                    final offset = details.globalPosition;
+                    _showDropdown(context, offset);
+                  },
+                  child: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Color(0xffe3eed4),
+                    child: Icon(
+                      Icons.account_circle,
+                      size: 45,
+                      color: Color.fromARGB(255, 0, 15, 22),
                     ),
                   ),
-                  onSubmitted: (query) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SearchPage(query: query),
-                      ),
-                    );
-                  },
                 ),
-              ),
-              const SizedBox(width: 10),
-              // Profile Icon
-              IconButton(
-                icon: const Icon(
-                  Icons.account_circle,
-                  size: 45,
-                  color: Color(0xffe3eed4),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/profile');
-                },
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
