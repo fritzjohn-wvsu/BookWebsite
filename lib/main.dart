@@ -11,10 +11,9 @@ import 'pages/homepage.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions
-        .currentPlatform, // Initialize Firebase with generated options
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp()); // Run the app after Firebase is initialized
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
