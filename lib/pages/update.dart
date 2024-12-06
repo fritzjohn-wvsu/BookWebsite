@@ -128,10 +128,6 @@ Widget bookRectangle(
 }
 
 Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {
-<<<<<<< HEAD
-  // Pass context here
-=======
->>>>>>> fritz
   return GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
@@ -163,12 +159,8 @@ Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {
       final previewLink = volumeInfo['previewLink'] ?? '';
 
       return bookRectangle(
-<<<<<<< HEAD
-        context, // Pass context here
-=======
         context,
         bookList[index]['id'], // Pass the correct bookId
->>>>>>> fritz
         title,
         imageUrl,
         description,
