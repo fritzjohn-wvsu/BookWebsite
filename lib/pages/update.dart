@@ -6,7 +6,6 @@ import 'bookDetails.dart';
 // Google Books API key
 const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
 
-/// Fetches books from the Google Books API based on queries.
 Future<List<dynamic>> fetchBooks() async {
   final urls = [
     'https://www.googleapis.com/books/v1/volumes?q=fiction&key=$googleBooksApiKey',
@@ -19,7 +18,6 @@ Future<List<dynamic>> fetchBooks() async {
     final responses =
         await Future.wait(urls.map((url) => http.get(Uri.parse(url))));
 
-    // Collecting book items from all the responses
     for (var response in responses) {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -30,14 +28,12 @@ Future<List<dynamic>> fetchBooks() async {
       }
     }
 
-    // Sort books by published date in descending order
     allBooks.sort((a, b) {
       final dateA = a['volumeInfo']['publishedDate'] ?? '';
       final dateB = b['volumeInfo']['publishedDate'] ?? '';
-      return dateB.compareTo(dateA); // Descending order by date
+      return dateB.compareTo(dateA);
     });
 
-    // Limit to the 10 latest books
     return allBooks.take(10).toList();
   } catch (e) {
     debugPrint('Error fetching books: $e');
@@ -45,12 +41,11 @@ Future<List<dynamic>> fetchBooks() async {
   }
 }
 
-/// Widget to display a book with its details.
 Widget bookRectangle(
   BuildContext context,
   String bookId,
   String bookName,
-  String? imageUrl, // Allow imageUrl to be nullable
+  String? imageUrl,
   String description,
   String author,
   String publishedDate,
@@ -65,8 +60,7 @@ Widget bookRectangle(
         MaterialPageRoute(
           builder: (context) => BookDetailPage(
             title: bookName,
-            imageUrl: imageUrl ??
-                'https://via.placeholder.com/150', // Default image if null
+            imageUrl: imageUrl ?? 'https://via.placeholder.com/150',
             description: description,
             author: author,
             publishedDate: publishedDate,
@@ -79,7 +73,6 @@ Widget bookRectangle(
     },
     child: Column(
       children: [
-        // Book Image
         Container(
           width: 200,
           height: 300,
@@ -115,11 +108,11 @@ Widget bookRectangle(
             textAlign: TextAlign.center,
           ),
         ),
-        // Publication Date
+
         SizedBox(
           width: 200,
           child: Text(
-            '($publishedDate)', // Date in parentheses
+            '($publishedDate)',
             style: const TextStyle(
               color: Color(0xffe3eed4),
               fontSize: 12,
@@ -134,16 +127,15 @@ Widget bookRectangle(
   );
 }
 
-/// Builds a grid view of books.
 Widget buildBookGrid(List<dynamic> bookList, BuildContext context) {
   return GridView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 5, // 5 items per row
-      crossAxisSpacing: 20.0, // Horizontal space
-      mainAxisSpacing: 10.0, // Vertical space
-      childAspectRatio: 200 / 300, // Width to height ratio
+      crossAxisCount: 5,
+      crossAxisSpacing: 20.0,
+      mainAxisSpacing: 10.0,
+      childAspectRatio: 200 / 300,
     ),
     itemCount: bookList.length,
     itemBuilder: (context, index) {

@@ -18,10 +18,8 @@ class _LoginState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Firebase Authentication instance
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Validation for email
   String? validateEmail(String? email) {
     RegExp emailRegex = RegExp(r'^[\w\.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
     final isEmailValid = emailRegex.hasMatch(email ?? '');
@@ -31,7 +29,6 @@ class _LoginState extends State<LoginPage> {
     return null;
   }
 
-  // Sign in with Firebase
   Future<void> _signIn() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -43,16 +40,13 @@ class _LoginState extends State<LoginPage> {
           password: password,
         );
 
-        // Successful login
         if (userCredential.user != null) {
-          // Show success dialog
           _showDialog(
               "Login Successful!",
               "You successfully login your account ${userCredential.user!.email}",
               true);
         }
       } on FirebaseAuthException catch (e) {
-        // Handle Firebase Auth errors
         if (e.code == 'user-not-found') {
           _showDialog(
               "Login Failed", "No user found with this email address.", false);
@@ -63,14 +57,12 @@ class _LoginState extends State<LoginPage> {
               "The email address or password you entered is incorrect.", false);
         }
       } catch (e) {
-        // Catch all other errors
         _showDialog("Login Failed",
             "The email address or password you entered is incorrect.", false);
       }
     }
   }
 
-  // Show success or error dialog
   void _showDialog(String title, String message, bool isSuccess) {
     showDialog(
       context: context,
@@ -78,8 +70,8 @@ class _LoginState extends State<LoginPage> {
         return AlertDialog(
           title: Text(title),
           content: Container(
-            width: 400, // Set fixed width for the content
-            height: 30, // Set fixed height for the content
+            width: 400,
+            height: 30,
             child: Column(
               children: [
                 Text(message),
@@ -92,7 +84,6 @@ class _LoginState extends State<LoginPage> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if (isSuccess) {
-                  // Navigate to the homepage if login is successful
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const Homepage()),
@@ -158,7 +149,7 @@ class _LoginState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Password Textfield
+
               SizedBox(
                 width: 500,
                 child: TextFormField(
@@ -184,7 +175,7 @@ class _LoginState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 35),
-              // Login Button
+
               SizedBox(
                 width: 500,
                 child: ElevatedButton(
@@ -250,7 +241,7 @@ class _LoginState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Sign up link
+
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -289,7 +280,6 @@ class _LoginState extends State<LoginPage> {
     );
   }
 
-  // Toggle Password Visibility
   Widget togglePassword() {
     return IconButton(
       color: Color(0xffe3eed4),

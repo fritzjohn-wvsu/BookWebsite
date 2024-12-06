@@ -7,7 +7,6 @@ import 'bookDetails.dart';
 // Your Google Books API key
 const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
 
-// Fetch books from Google Books API
 Future<List<dynamic>> fetchBooks() async {
   final urls = [
     'https://www.googleapis.com/books/v1/volumes?q=fiction&key=$googleBooksApiKey',
@@ -35,10 +34,8 @@ Future<List<dynamic>> fetchBooks() async {
       }
     }
 
-    // Randomize the list of books
     allBooks.shuffle(Random());
 
-    // Return only the first 5 books
     return allBooks.take(5).toList();
   } catch (e) {
     debugPrint('Error fetching books: $e');
@@ -48,7 +45,7 @@ Future<List<dynamic>> fetchBooks() async {
 
 Widget popularBook() {
   return FutureBuilder<List<dynamic>>(
-    future: fetchBooks(), // Fetch books asynchronously
+    future: fetchBooks(),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(child: CircularProgressIndicator());
@@ -84,7 +81,6 @@ Widget popularBook() {
                     height: 20,
                   ),
                   const SizedBox(height: 25),
-                  // Display the books in a grid
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -116,10 +112,8 @@ Widget popularBook() {
                       final printType = volumeInfo['printType'] ?? 'Unknown';
                       final previewLink = volumeInfo['previewLink'] ?? '';
 
-                      // Gesture to navigate to the details page
                       return GestureDetector(
                         onTap: () {
-                          // Ensure the imageUrl is valid before navigating
                           if (imageUrl != null) {
                             Navigator.push(
                               context,
@@ -137,7 +131,6 @@ Widget popularBook() {
                               ),
                             );
                           } else {
-                            // Handle case where there's no image
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -157,7 +150,6 @@ Widget popularBook() {
                         },
                         child: Column(
                           children: [
-                            // Book Image or Placeholder
                             Container(
                               width: 200,
                               height: 300,
@@ -185,7 +177,6 @@ Widget popularBook() {
                                   : null,
                             ),
                             const SizedBox(height: 8),
-                            // Book Title
                             SizedBox(
                               width: 200,
                               child: Text(

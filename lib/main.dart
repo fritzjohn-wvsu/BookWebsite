@@ -1,9 +1,7 @@
 import 'package:main/pages/favoritespage.dart';
-
 import '/pages/about.dart';
 import '/pages/booklist.dart';
 import 'pages/login_page.dart';
-import '/pages/profile_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
@@ -39,7 +37,6 @@ class MyApp extends StatelessWidget {
         '/signup': (context) => SignUp(),
         '/login': (context) => LoginPage(),
         '/homepage': (context) => Homepage(),
-        '/profile': (context) => ProfilePage(),
         '/about': (context) => About(),
         '/books': (context) => BookListWidget(),
         '/favorite': (context) => FavoriteBooksPage()

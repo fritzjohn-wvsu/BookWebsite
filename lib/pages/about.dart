@@ -12,18 +12,14 @@ class About extends StatefulWidget {
 class _AboutState extends State<About> {
   @override
   Widget build(BuildContext context) {
-    // Using MediaQuery for responsive layout
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 15, 22),
       body: SingleChildScrollView(
-        // Wrap the content with SingleChildScrollView  to avoid overflow
         child: Column(
           children: [
-            // Include the navigation bar at the top
             navigationBar(),
-            // The rest of the page content
             Center(
               child: Container(
                 width: 1450,
@@ -31,7 +27,6 @@ class _AboutState extends State<About> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Image and text sections side by side for wide screens
                     if (screenWidth > 600)
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,7 +59,6 @@ class _AboutState extends State<About> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
-            // Footer section
             FooterPage(),
           ],
         ),
@@ -72,7 +66,6 @@ class _AboutState extends State<About> {
     );
   }
 
-  // Method for building the image section
   Widget _buildImageSection() {
     return Container(
       width: 300,
@@ -91,7 +84,6 @@ class _AboutState extends State<About> {
     );
   }
 
-  // Method for building the text section
   Widget _buildTextSection() {
     return Expanded(
       child: Column(

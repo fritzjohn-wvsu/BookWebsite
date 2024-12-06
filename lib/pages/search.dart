@@ -106,7 +106,6 @@ class _SearchPageState extends State<SearchPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    //go to bookdetailpage
                                     builder: (context) => BookDetailPage(
                                       title: book['title'] ?? 'No Title',
                                       imageUrl: book['imageLinks']

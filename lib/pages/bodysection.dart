@@ -8,7 +8,6 @@ Widget bodySection(BuildContext context) {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Left Section: Text Content
         Padding(
           padding: const EdgeInsets.only(left: 40),
           child: Expanded(
@@ -94,7 +93,6 @@ Widget bodySection(BuildContext context) {
             ),
           ),
         ),
-        // Right Section: Image
         Align(
           alignment: Alignment.topRight,
           child: SizedBox(

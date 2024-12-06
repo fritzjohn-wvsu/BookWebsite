@@ -75,7 +75,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         await doc.reference.delete();
       }
     } else {
-      // Add to Firestore as a favorite
+      // Add to Firestore as a favorite books
       await collection.add({
         'email': userEmail,
         'title': widget.title,
@@ -94,7 +94,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     });
   }
 
-  // Launch preview link
+  // Launch preview link of the book
   Future<void> _launchPreviewLink() async {
     final Uri url = Uri.parse(widget.previewLink);
     if (await canLaunch(url.toString())) {
@@ -104,7 +104,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }
   }
 
-  // Navigation method to go to the FavoriteBooksPage
   void _navigateToFavorites() {
     Navigator.push(
       context,
@@ -168,8 +167,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                                 : Icons.favorite_border,
                             color: _isFavorite ? Colors.red : Colors.white,
                           ),
-                          onPressed:
-                              _toggleFavorite, // Always toggle regardless of state
+                          onPressed: _toggleFavorite,
                         ),
                         Text(
                           _isFavorite

@@ -13,7 +13,6 @@ class _NavigationBarState extends State<navigationBar> {
   final TextEditingController searchController = TextEditingController();
   late Future<Map<String, String>> _userInfoFuture;
 
-  // Function to style the nav item with active state
   Widget buildNavItem(String title, String routeName) {
     return ValueListenableBuilder<String>(
       valueListenable: RouteManager.currentRoute,
@@ -47,23 +46,18 @@ class _NavigationBarState extends State<navigationBar> {
     );
   }
 
-  // Fetch user info from Firestore based on email address
   Future<Map<String, String>> _getUserInfoFromFirestore(String email) async {
     final firestoreInstance = FirebaseFirestore.instance;
     try {
-      // Query Firestore for a user document where the email address matches
       QuerySnapshot userDocs = await firestoreInstance
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
 
       if (userDocs.docs.isNotEmpty) {
-        var userDoc =
-            userDocs.docs.first; // Assuming one user matches the email
-        String userName =
-            userDoc['username'] ?? 'No name'; // Adjusted field name
-        String emailAddress =
-            userDoc['email'] ?? 'No email'; // Adjusted field name
+        var userDoc = userDocs.docs.first;
+        String userName = userDoc['username'] ?? 'No name';
+        String emailAddress = userDoc['email'] ?? 'No email';
         return {'userName': userName, 'emailAddress': emailAddress};
       } else {
         throw Exception('No user found with that email address.');
@@ -74,27 +68,23 @@ class _NavigationBarState extends State<navigationBar> {
     }
   }
 
-  // Show dropdown menu with user info and logout
   void _showDropdown(BuildContext context, Offset offset) async {
     final User? user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      return; // If the user is not logged in, do nothing
+      return;
     }
 
     try {
-      // Fetch user information from Firestore using email
       Map<String, String> userInfo =
           await _getUserInfoFromFirestore(user.email!);
 
-      // Show the dropdown menu with user info
       _showMenuWithUserInfo(context, offset, userInfo);
     } catch (e) {
       print("Error fetching user info: $e");
     }
   }
 
-  // Display user info in the dropdown menu
   void _showMenuWithUserInfo(
     BuildContext context,
     Offset offset,
@@ -104,7 +94,7 @@ class _NavigationBarState extends State<navigationBar> {
       context: context,
       position: RelativeRect.fromLTRB(
         offset.dx,
-        offset.dy + 40, // Adjust to position the dropdown below the icon
+        offset.dy + 40,
         0,
         0,
       ),
@@ -128,7 +118,7 @@ class _NavigationBarState extends State<navigationBar> {
           ),
         ),
         PopupMenuItem<String>(
-          enabled: false, // Add space before Logout
+          enabled: false,
           child: SizedBox(height: 2),
         ),
         PopupMenuItem<String>(
@@ -189,7 +179,6 @@ class _NavigationBarState extends State<navigationBar> {
                 ],
               ),
             ),
-            // Centered nav items
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -202,7 +191,6 @@ class _NavigationBarState extends State<navigationBar> {
                 ],
               ),
             ),
-            // Search bar and Profile icon
             Row(
               children: [
                 Container(
@@ -246,7 +234,6 @@ class _NavigationBarState extends State<navigationBar> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Profile Icon with dropdown near the icon
                 GestureDetector(
                   onTapDown: (details) {
                     final offset = details.globalPosition;

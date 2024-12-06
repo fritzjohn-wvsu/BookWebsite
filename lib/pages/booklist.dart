@@ -240,30 +240,26 @@ class _BookListWidgetState extends State<BookListWidget> {
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
                                 borderSide: const BorderSide(
-                                    color: Color.fromRGBO(11, 11, 11,
-                                        1)), // Set border color to white
+                                    color: Color.fromRGBO(11, 11, 11, 1)),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
-                                borderSide: const BorderSide(
-                                    color: Colors
-                                        .black), // Border color when the field is enabled
+                                borderSide:
+                                    const BorderSide(color: Colors.black),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20.0),
-                                borderSide: const BorderSide(
-                                    color: Colors
-                                        .white), // Border color when the field is focused
+                                borderSide:
+                                    const BorderSide(color: Colors.white),
                               ),
                             ),
                           ),
                           const SizedBox(height: 20),
-                          // Combined Row for Genre and Sort Dropdowns, Centered
+
                           Center(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                // Sort Dropdown (now first)
                                 Container(
                                   width: 150,
                                   height: 50,
@@ -289,7 +285,7 @@ class _BookListWidgetState extends State<BookListWidget> {
                                       onChanged: (value) {
                                         setState(() {
                                           _selectedSort = value!;
-                                          sortBooks(); // Re-sort the books when a new option is selected
+                                          sortBooks();
                                         });
                                       },
                                       dropdownColor: const Color(0xff1c2a36),
@@ -308,7 +304,6 @@ class _BookListWidgetState extends State<BookListWidget> {
                                   ),
                                 ),
                                 const SizedBox(width: 50),
-                                // Genre Dropdown (now second)
                                 Container(
                                   width: 150,
                                   height: 50,

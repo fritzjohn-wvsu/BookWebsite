@@ -275,9 +275,7 @@ class _SignUpState extends State<SignUp> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      onPressed: () {
-                        // Add Facebook sign-in logic here
-                      },
+                      onPressed: () {},
                       icon: const Icon(
                         FontAwesomeIcons.facebook,
                         color: Color(0xffe3eed4),
@@ -285,9 +283,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                     const SizedBox(width: 20),
                     IconButton(
-                      onPressed: () {
-                        // Add Google sign-in logic here
-                      },
+                      onPressed: () {},
                       icon: const Icon(
                         FontAwesomeIcons.google,
                         color: Color(0xffe3eed4),
@@ -295,9 +291,7 @@ class _SignUpState extends State<SignUp> {
                     ),
                     const SizedBox(width: 20),
                     IconButton(
-                      onPressed: () {
-                        // Add Twitter sign-in logic here
-                      },
+                      onPressed: () {},
                       icon: const Icon(
                         FontAwesomeIcons.twitter,
                         color: Color(0xffe3eed4),

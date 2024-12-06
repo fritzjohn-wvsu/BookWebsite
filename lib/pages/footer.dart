@@ -10,12 +10,10 @@ class FooterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Helper function to style active and inactive links
     Widget buildNavItem(String title, String routeName, Widget destination) {
       bool isActive = RouteManager.currentRoute.value == routeName;
       return TextButton(
         onPressed: () {
-          // Update the current route in RouteManager
           RouteManager.currentRoute.value = routeName;
           Navigator.push(
             context,
@@ -39,7 +37,7 @@ class FooterPage extends StatelessWidget {
         return Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
-          color: const Color(0xffe3eed4), // Footer background color
+          color: const Color(0xffe3eed4),
           child: Padding(
             padding: const EdgeInsets.only(left: 25, right: 25),
             child: Row(

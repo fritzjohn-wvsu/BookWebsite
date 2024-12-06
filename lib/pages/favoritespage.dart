@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth for user management
-import 'bookDetails.dart'; // Import the BookDetailPage for navigation
+import 'package:firebase_auth/firebase_auth.dart';
+import 'bookDetails.dart';
 
 class FavoriteBooksPage extends StatefulWidget {
   const FavoriteBooksPage({Key? key}) : super(key: key);
@@ -12,27 +12,24 @@ class FavoriteBooksPage extends StatefulWidget {
 
 class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
   List<Map<String, dynamic>> favoriteBooks = [];
-  final String? userEmail = FirebaseAuth
-      .instance.currentUser?.email; // Using email for identification
-  bool isLoading = true; // To track loading state
+  final String? userEmail = FirebaseAuth.instance.currentUser?.email;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     if (userEmail != null) {
-      _fetchFavoriteBooks(); // Fetch the favorite books of the logged-in user
+      _fetchFavoriteBooks();
     }
   }
 
-  // Fetch favorite books from Firestore
   Future<void> _fetchFavoriteBooks() async {
     if (userEmail == null) return;
 
     try {
       final collection = FirebaseFirestore.instance.collection('favorites');
-      final querySnapshot = await collection
-          .where('email', isEqualTo: userEmail)
-          .get(); // Using email as the identifier
+      final querySnapshot =
+          await collection.where('email', isEqualTo: userEmail).get();
 
       if (querySnapshot.docs.isEmpty) {
         print('No favorite books found.');
@@ -53,15 +50,15 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
                 (data['categories'] ?? 'Unknown Categories').toString(),
             'printType': (data['printType'] ?? 'Unknown Print Type').toString(),
             'previewLink': (data['previewLink'] ?? '').toString(),
-            'docId': doc.id, // Store the document ID to handle removal
+            'docId': doc.id,
           };
         }).toList();
-        isLoading = false; // Set loading to false once data is fetched
+        isLoading = false;
       });
     } catch (e) {
       print('Error fetching favorite books: $e');
       setState(() {
-        isLoading = false; // Set loading to false if an error occurs
+        isLoading = false;
       });
     }
   }
@@ -72,10 +69,8 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
 
     try {
       final collection = FirebaseFirestore.instance.collection('favorites');
-      await collection
-          .doc(docId)
-          .delete(); // Delete the document from Firestore
-      _fetchFavoriteBooks(); // Refresh the list after removal
+      await collection.doc(docId).delete();
+      _fetchFavoriteBooks();
     } catch (e) {
       print('Error removing favorite book: $e');
     }
@@ -117,13 +112,11 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
                   ),
                 )
               : SingleChildScrollView(
-                  // Wrap everything inside a SingleChildScrollView
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                        width: double
-                            .infinity, // This will make the container take the full width
+                        width: double.infinity,
                         decoration: BoxDecoration(
                           color: const Color.fromARGB(255, 0, 15, 22),
                           borderRadius: BorderRadius.circular(10),
@@ -145,10 +138,8 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
                               height: 20,
                             ),
                             const SizedBox(height: 25),
-                            // Wrap GridView inside a SizedBox to limit the height
                             SizedBox(
-                              height:
-                                  600, // Set a fixed height for the GridView
+                              height: 600,
                               child: GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
@@ -165,7 +156,6 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
 
                                   return GestureDetector(
                                     onTap: () async {
-                                      // Navigate to book details
                                       final result = await Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -190,7 +180,6 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
                                         ),
                                       );
 
-                                      // If the result is not null, we update the favorite list
                                       if (result != null) {
                                         _fetchFavoriteBooks();
                                       }
@@ -238,7 +227,6 @@ class _FavoriteBooksPageState extends State<FavoriteBooksPage> {
                                         SizedBox(
                                           height: 20,
                                         ),
-                                        //remove the favorite books
                                         Container(
                                           width: 200,
                                           height: 30,
