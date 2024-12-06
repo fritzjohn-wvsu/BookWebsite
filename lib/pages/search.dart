@@ -7,7 +7,7 @@ import 'navigation.dart';
 class SearchPage extends StatefulWidget {
   final String query;
 
-  const SearchPage({Key? key, required this.query}) : super(key: key);
+  const SearchPage({super.key, required this.query});
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -25,10 +25,10 @@ class _SearchPageState extends State<SearchPage> {
     fetchBooks(widget.query);
   }
 
-//fetch the books 
+//fetch the books
   Future<void> fetchBooks(String query) async {
     final url = Uri.parse(
-        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk');
+        'https://www.googleapis.com/books/v1/volumes?q=$query&key=AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -105,16 +105,23 @@ class _SearchPageState extends State<SearchPage> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute( //go to bookdetailpage
+                                  MaterialPageRoute(
                                     builder: (context) => BookDetailPage(
                                       title: book['title'] ?? 'No Title',
-                                      imageUrl: book['imageLinks']?['thumbnail'],
-                                      description: book['description'] ?? 'No Description',
-                                      author: book['authors']?.join(', ') ?? 'Unknown Author',
-                                      publishedDate: book['publishedDate'] ?? 'Unknown',
-                                      categories: book['categories']?.join(', ') ?? 'Unknown',
+                                      imageUrl: book['imageLinks']
+                                          ?['thumbnail'],
+                                      description: book['description'] ??
+                                          'No Description',
+                                      author: book['authors']?.join(', ') ??
+                                          'Unknown Author',
+                                      publishedDate:
+                                          book['publishedDate'] ?? 'Unknown',
+                                      categories:
+                                          book['categories']?.join(', ') ??
+                                              'Unknown',
                                       printType: book['printType'] ?? 'Unknown',
-                                      previewLink: book['previewLink'] ?? 'https://www.google.com',
+                                      previewLink: book['previewLink'] ??
+                                          'https://www.google.com',
                                     ),
                                   ),
                                 );
@@ -128,15 +135,16 @@ class _SearchPageState extends State<SearchPage> {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: const Color.fromARGB(255, 0, 15, 22), 
-                          backgroundColor: const Color(0xffe3eed4), 
-                          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                          foregroundColor: const Color.fromARGB(255, 0, 15, 22),
+                          backgroundColor: const Color(0xffe3eed4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 10),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24), 
+                            borderRadius: BorderRadius.circular(24),
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pop(context); 
+                          Navigator.pop(context);
                         },
                         child: const Text('Close'),
                       ),
@@ -149,7 +157,7 @@ class _SearchPageState extends State<SearchPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: navigationBar(context),
+            child: navigationBar(),
           ),
         ],
       ),

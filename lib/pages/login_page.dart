@@ -1,33 +1,25 @@
-import 'signup_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'signup_page.dart';
+import 'homepage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:main/pages/homepage.dart';
 
 final _formKey = GlobalKey<FormState>();
 
-class UpdateLogin extends StatelessWidget {
-  const UpdateLogin({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'ciales_ponce',
-      debugShowCheckedModeBanner: true,
-    );
-  }
-}
-
-class Login extends StatefulWidget {
-  const Login({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
   @override
   _LoginState createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<LoginPage> {
   bool _isSecurePassword = true;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  // Validation for email
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   String? validateEmail(String? email) {
     RegExp emailRegex = RegExp(r'^[\w\.-]+@[\w-]+\.\w{2,3}(\.\w{2,3})?$');
     final isEmailValid = emailRegex.hasMatch(email ?? '');
@@ -37,24 +29,77 @@ class _LoginState extends State<Login> {
     return null;
   }
 
+  Future<void> _signIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (_formKey.currentState!.validate()) {
+      try {
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        if (userCredential.user != null) {
+          _showDialog(
+              "Login Successful!",
+              "You successfully login your account ${userCredential.user!.email}",
+              true);
+        }
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          _showDialog(
+              "Login Failed", "No user found with this email address.", false);
+        } else if (e.code == 'wrong-password') {
+          _showDialog("Login Failed", "Incorrect password entered.", false);
+        } else {
+          _showDialog("Login Failed",
+              "The email address or password you entered is incorrect.", false);
+        }
+      } catch (e) {
+        _showDialog("Login Failed",
+            "The email address or password you entered is incorrect.", false);
+      }
+    }
+  }
+
+  void _showDialog(String title, String message, bool isSuccess) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Container(
+            width: 400,
+            height: 30,
+            child: Column(
+              children: [
+                Text(message),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("OK"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (isSuccess) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Homepage()),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 0, 15, 22),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xffe3eed4)),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Homepage(), 
-              ),
-            );
-          },
-        ),
-      ),
       backgroundColor: Color.fromARGB(255, 0, 15, 22),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,22 +111,26 @@ class _LoginState extends State<Login> {
               const Center(
                 child: Text(
                   'Welcome',
-                  style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Color(0xffe3eed4)),
+                  style: TextStyle(
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xffe3eed4)),
                   textAlign: TextAlign.center,
                 ),
               ),
               const Center(
                 child: Text(
-                  'Enter your credential to login',
+                  'Enter your credentials to login',
                   style: TextStyle(fontSize: 15, color: Color(0xffe3eed4)),
                   textAlign: TextAlign.center,
                 ),
               ),
               const SizedBox(height: 50),
-              //EmailTextfield
+              // Email Textfield
               SizedBox(
                 width: 500,
                 child: TextFormField(
+                  controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
                   style: TextStyle(color: Color(0xffe3eed4)),
                   decoration: InputDecoration(
@@ -92,29 +141,32 @@ class _LoginState extends State<Login> {
                     prefixIcon: Icon(Icons.mail, color: Color(0xffe3eed4)),
                     border: OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+                      borderSide:
+                          BorderSide(color: Color(0xffe3eed4), width: 2.0),
                     ),
                   ),
                   validator: validateEmail,
                 ),
-
               ),
               const SizedBox(height: 20),
+
               SizedBox(
                 width: 500,
                 child: TextFormField(
+                  controller: _passwordController,
                   obscureText: _isSecurePassword,
-                  style: TextStyle(color: Color(0xffe3eed4)), // Text color
+                  style: TextStyle(color: Color(0xffe3eed4)),
                   decoration: InputDecoration(
                     labelText: 'Password',
-                    labelStyle: TextStyle(color: Color(0xffe3eed4)), // Label color
+                    labelStyle: TextStyle(color: Color(0xffe3eed4)),
                     hintText: 'Enter your password',
-                    hintStyle: TextStyle(color: Color(0xffe3eed4)), // Hint color
-                    prefixIcon: Icon(Icons.lock, color: Color(0xffe3eed4)), // Prefix icon color
-                    suffixIcon: togglePassword(), // Password visibility toggle button
+                    hintStyle: TextStyle(color: Color(0xffe3eed4)),
+                    prefixIcon: Icon(Icons.lock, color: Color(0xffe3eed4)),
+                    suffixIcon: togglePassword(),
                     border: OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0), // Focused border
+                      borderSide:
+                          BorderSide(color: Color(0xffe3eed4), width: 2.0),
                     ),
                   ),
                   validator: (pass) => pass!.length <= 8
@@ -122,14 +174,12 @@ class _LoginState extends State<Login> {
                       : null,
                 ),
               ),
-
               const SizedBox(height: 35),
+
               SizedBox(
-                width: 200,
+                width: 500,
                 child: ElevatedButton(
-                  onPressed: () {
-                    _formKey.currentState!.validate();
-                  },
+                  onPressed: _signIn,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 25),
                     shape: RoundedRectangleBorder(
@@ -147,50 +197,38 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
-               const SizedBox(height: 30),
+              const SizedBox(height: 30),
               Container(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                  child: const Text(
-                    "Or Log In with",
-                    style: TextStyle(
-                      color: Color(0xffe3eed4),
-                      fontSize: 12,
-                    ),
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                child: const Text(
+                  "Or Log In with",
+                  style: TextStyle(
+                    color: Color(0xffe3eed4),
+                    fontSize: 12,
                   ),
                 ),
-                 
-                Container(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center, 
-                    children: [
-                      IconButton(
-                        icon: FaIcon(
-                          FontAwesomeIcons.facebook,
-                          color: Color(0xffe3eed4), 
-                        ),
-                        onPressed: () {
-                        },
-                      ),
-                      IconButton(
-                        icon: FaIcon(
-                          FontAwesomeIcons.twitter,
-                          color: Color(0xffe3eed4), 
-                        ),
-                        onPressed: () {
-                        },
-                      ),
-                      IconButton(
-                        icon: FaIcon(
-                          FontAwesomeIcons.instagram,
-                          color: Color(0xffe3eed4), 
-                        ),
-                        onPressed: () {
-                        },
-                      ),
-                    ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: FaIcon(FontAwesomeIcons.facebook,
+                        color: Color(0xffe3eed4)),
+                    onPressed: () {},
                   ),
-                ),
-              const SizedBox(height: 80),
+                  IconButton(
+                    icon: FaIcon(FontAwesomeIcons.twitter,
+                        color: Color(0xffe3eed4)),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: FaIcon(FontAwesomeIcons.google,
+                        color: Color(0xffe3eed4)),
+                    onPressed: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
               const Center(
                 child: Text(
                   'Forgot password?',
@@ -203,6 +241,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 20),
+
               Center(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -224,7 +263,7 @@ class _LoginState extends State<Login> {
                               builder: (context) => const SignUp()),
                         );
                       },
-                      child: const Text("Sign In",
+                      child: const Text("Sign Up",
                           style: TextStyle(
                             color: Color(0xffe3eed4),
                             fontSize: 12,
@@ -241,17 +280,17 @@ class _LoginState extends State<Login> {
     );
   }
 
-  // Toggle Password Visibility
   Widget togglePassword() {
     return IconButton(
       color: Color(0xffe3eed4),
-        onPressed: () {
-          setState(() {
-            _isSecurePassword = !_isSecurePassword;
-          });
-        },
-        icon: _isSecurePassword
-            ? Icon(Icons.visibility_off)
-            : Icon(Icons.visibility));
+      onPressed: () {
+        setState(() {
+          _isSecurePassword = !_isSecurePassword;
+        });
+      },
+      icon: _isSecurePassword
+          ? const Icon(Icons.visibility_off)
+          : const Icon(Icons.visibility),
+    );
   }
 }

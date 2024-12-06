@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+>>>>>>> fritz
 import 'login_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:main/pages/homepage.dart';
 
 final _formKey = GlobalKey<FormState>();
 
@@ -13,16 +17,21 @@ class SignUp extends StatefulWidget {
   const SignUp({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _SignUpState createState() => _SignUpState();
 }
 
-class _HomePageState extends State<SignUp> {
+class _SignUpState extends State<SignUp> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String? validateEmail(String? email) {
     if (email == null || email.isEmpty) {
@@ -39,6 +48,9 @@ class _HomePageState extends State<SignUp> {
   String? validateUsername(String? username) {
     if (username == null || username.isEmpty) {
       return 'Username is required';
+    }
+    if (username.length < 5) {
+      return 'Username must be at least 5 characters';
     }
     return null;
   }
@@ -63,6 +75,7 @@ class _HomePageState extends State<SignUp> {
     return null;
   }
 
+<<<<<<< HEAD
   // Function to show the validation dialog
   void showDialogValidation(BuildContext context) {
     if (_formKey.currentState!.validate()) {
@@ -123,12 +136,96 @@ class _HomePageState extends State<SignUp> {
           );
         },
       );
+=======
+  Future<void> _signUp() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        UserCredential userCredential =
+            await _auth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'username': _usernameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'created_at': FieldValue.serverTimestamp(),
+        });
+
+        await _showDialog(context, 'Success', 'Account created successfully!');
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+        );
+      } catch (e) {
+        _showDialog(context, 'Error',
+            'Failed to create account: The username or email address is already in use by another account.');
+      }
+>>>>>>> fritz
     }
+  }
+
+  Future<void> _showDialog(
+      BuildContext context, String title, String message) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    required Icon icon,
+    required String? Function(String?) validator,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return SizedBox(
+      width: 500,
+      child: TextFormField(
+        controller: controller,
+        obscureText: obscureText,
+        style: const TextStyle(color: Color(0xffe3eed4)),
+        decoration: InputDecoration(
+          prefixIcon: Padding(
+            padding: const EdgeInsets.all(0.0),
+            child: icon,
+          ),
+          suffixIcon: suffixIcon,
+          border: const OutlineInputBorder(),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xffe3eed4), width: 2.0),
+          ),
+          labelText: label,
+          labelStyle: const TextStyle(color: Color(0xffe3eed4)),
+          hintText: hint,
+          hintStyle: const TextStyle(color: Color(0xffe3eed4)),
+        ),
+        validator: validator,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 0, 15, 22),
         elevation: 0,
@@ -145,21 +242,27 @@ class _HomePageState extends State<SignUp> {
         ),
       ),
       backgroundColor: Color.fromARGB(255, 0, 15, 22),
+=======
+      backgroundColor: const Color.fromARGB(255, 0, 15, 22),
+>>>>>>> fritz
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(0),
+          padding: const EdgeInsets.all(20.0),
           child: Form(
             key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Sign up title section
-                Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          top: 0, left: 50, right: 50, bottom: 50),
+                const Padding(
+                  padding: EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    "Sign Up",
+                    style: TextStyle(
+                      color: Color(0xffe3eed4),
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold,
                     ),
+<<<<<<< HEAD
                     Column(
                       children: [
                         Text(
@@ -317,43 +420,139 @@ class _HomePageState extends State<SignUp> {
                     ),
                     validator: validateConfirmPassword,
                   ),
+=======
+                  ),
                 ),
-                SizedBox(height: 20),
-                // Sign Up button
-                Container(
-                  width: 200,
+                const Text(
+                  "Create Your Account!",
+                  style: TextStyle(color: Color(0xffe3eed4), fontSize: 15),
+                ),
+                const SizedBox(height: 50),
+                buildTextField(
+                  controller: _usernameController,
+                  label: 'Username',
+                  hint: 'Enter your username (5 characters)',
+                  icon: const Icon(Icons.person, color: Color(0xffe3eed4)),
+                  validator: validateUsername,
+                ),
+                const SizedBox(height: 20),
+                buildTextField(
+                  controller: _emailController,
+                  label: 'E-mail Address',
+                  hint: 'Enter your email',
+                  icon: const Icon(Icons.email, color: Color(0xffe3eed4)),
+                  validator: validateEmail,
+>>>>>>> fritz
+                ),
+                const SizedBox(height: 20),
+                buildTextField(
+                  controller: _passwordController,
+                  label: 'Password',
+                  hint: 'Enter your password',
+                  icon: const Icon(Icons.lock, color: Color(0xffe3eed4)),
+                  obscureText: !_isPasswordVisible,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: const Color(0xffe3eed4),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isPasswordVisible = !_isPasswordVisible;
+                      });
+                    },
+                  ),
+                  validator: validatePassword,
+                ),
+                const SizedBox(height: 20),
+                buildTextField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirm Password',
+                  hint: 'Confirm your password',
+                  icon: const Icon(Icons.check, color: Color(0xffe3eed4)),
+                  obscureText: !_isConfirmPasswordVisible,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isConfirmPasswordVisible
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: const Color(0xffe3eed4),
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                      });
+                    },
+                  ),
+                  validator: validateConfirmPassword,
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 500,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 25),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),
+<<<<<<< HEAD
                       backgroundColor: Color(0xffe3eed4),
                     ),
                     onPressed: () {
                       showDialogValidation(context);
                     },
+=======
+                      backgroundColor: const Color(0xffe3eed4),
+                    ),
+                    onPressed: _signUp,
+>>>>>>> fritz
                     child: const Text(
                       'Sign Up',
                       style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 0, 15, 22)),
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 0, 15, 22),
+                      ),
                     ),
                   ),
                 ),
-                // Sign in with Google button
-                const SizedBox(height: 30),
-                Container(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                  child: const Text(
-                    "Or Sign In with",
-                    style: TextStyle(
-                      color: Color(0xffe3eed4),
-                      fontSize: 12,
-                    ),
-                  ),
+                const SizedBox(height: 20),
+                const Text(
+                  "Or sign up with",
+                  style: TextStyle(color: Color(0xffe3eed4)),
                 ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        FontAwesomeIcons.facebook,
+                        color: Color(0xffe3eed4),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        FontAwesomeIcons.google,
+                        color: Color(0xffe3eed4),
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        FontAwesomeIcons.twitter,
+                        color: Color(0xffe3eed4),
+                      ),
+                    ),
+                  ],
+                ),
+<<<<<<< HEAD
 
                 Container(
                   child: Row(
@@ -387,32 +586,27 @@ class _HomePageState extends State<SignUp> {
                 SizedBox(height: 20),
 
                 // Already have an account text
+=======
+                const SizedBox(height: 20),
+>>>>>>> fritz
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      "Already have an Account?",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Color(0xffe3eed4),
-                      ),
+                      'Already have an account?',
+                      style: TextStyle(color: Color(0xffe3eed4)),
                     ),
                     TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Color.fromARGB(255, 0, 15, 22),
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      ),
                       onPressed: () {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const Login()),
+                              builder: (context) => const LoginPage()),
                         );
                       },
                       child: const Text(
-                        'Log in',
+                        'Login',
                         style: TextStyle(
-                          fontSize: 12,
                           color: Color(0xffe3eed4),
                           fontWeight: FontWeight.bold,
                         ),

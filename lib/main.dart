@@ -1,12 +1,20 @@
+import 'package:main/pages/favoritespage.dart';
+import '/pages/about.dart';
+import '/pages/booklist.dart';
+import 'pages/login_page.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:main/pages/homepage.dart'; 
-import 'package:main/pages/booklist.dart';
-import 'package:main/pages/about.dart';
-import 'package:main/pages/login_page.dart';
-import 'package:main/pages/signup_page.dart';
+import 'firebase_options.dart';
+import 'pages/signup_page.dart';
+import 'pages/homepage.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions
+        .currentPlatform, // Initialize Firebase with generated options
+  );
+  runApp(MyApp()); // Run the app after Firebase is initialized
 }
 
 class MyApp extends StatelessWidget {
@@ -22,17 +30,16 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: 'Homepage', // first page that will appear
-      //route choices
+      // It calls the Signup page first
+      initialRoute: '/login',
+      // Different route choices
       routes: {
-        'Homepage': (BuildContext ctx) => const Homepage(),
-        '/': (context) => Homepage(),
-        '/home': (context) => Homepage(),
+        '/signup': (context) => SignUp(),
+        '/login': (context) => LoginPage(),
+        '/homepage': (context) => Homepage(),
         '/about': (context) => About(),
         '/books': (context) => BookListWidget(),
-        'Login': (context) => const Login(),
-        'UpdatedSignup': (context) => const SignUp(),
-        '/login': (context) =>Login(),
+        '/favorite': (context) => FavoriteBooksPage()
       },
     );
   }

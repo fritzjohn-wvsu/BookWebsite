@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:math'; 
-import 'bookDetails.dart'; 
+import 'dart:math';
+import 'bookDetails.dart';
 
 // Your Google Books API key
-const String googleBooksApiKey = 'AIzaSyBKsd3N8K0L4d6I-UZf5sOQE5LHWvdyPbk';
+const String googleBooksApiKey = 'AIzaSyDlMTirZpmVZ5h_8O3LJuwiThVYhickyIw';
 
-// Fetch books from Google Books API
 Future<List<dynamic>> fetchBooks() async {
   final urls = [
     'https://www.googleapis.com/books/v1/volumes?q=fiction&key=$googleBooksApiKey',
@@ -21,7 +20,8 @@ Future<List<dynamic>> fetchBooks() async {
         return response;
       }),
     );
-//fetch the books
+
+    // Fetch the books
     List<dynamic> allBooks = [];
 
     for (var response in responses) {
@@ -34,10 +34,8 @@ Future<List<dynamic>> fetchBooks() async {
       }
     }
 
-    // Randomize the list of books
     allBooks.shuffle(Random());
 
-    // Return only the first 5 books
     return allBooks.take(5).toList();
   } catch (e) {
     debugPrint('Error fetching books: $e');
@@ -47,7 +45,7 @@ Future<List<dynamic>> fetchBooks() async {
 
 Widget popularBook() {
   return FutureBuilder<List<dynamic>>(
-    future: fetchBooks(), // Fetch books asynchronously
+    future: fetchBooks(),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(child: CircularProgressIndicator());
@@ -83,7 +81,6 @@ Widget popularBook() {
                     height: 20,
                   ),
                   const SizedBox(height: 25),
-                  // Display the books in a grid
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -94,9 +91,10 @@ Widget popularBook() {
                       mainAxisSpacing: 10.0,
                       childAspectRatio: 200 / 300,
                     ),
-                    itemCount: books.length, // get all the description
+                    itemCount: books.length,
                     itemBuilder: (context, index) {
-                      final volumeInfo = books[index]['volumeInfo'];
+                      final book = books[index];
+                      final volumeInfo = book['volumeInfo'];
                       final title = volumeInfo['title'] ?? 'Unknown Title';
                       final imageUrl = volumeInfo['imageLinks']?['thumbnail'];
                       final description = volumeInfo['description'] ??
@@ -114,28 +112,44 @@ Widget popularBook() {
                       final printType = volumeInfo['printType'] ?? 'Unknown';
                       final previewLink = volumeInfo['previewLink'] ?? '';
 
-                      // Gesture to navigate to the details page
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BookDetailPage(
-                                title: title,
-                                imageUrl: imageUrl,
-                                description: description,
-                                author: author,
-                                publishedDate: publishedDate,
-                                categories: categories,
-                                printType: printType,
-                                previewLink: previewLink,
+                          if (imageUrl != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookDetailPage(
+                                  title: title,
+                                  imageUrl: imageUrl,
+                                  description: description,
+                                  author: author,
+                                  publishedDate: publishedDate,
+                                  categories: categories,
+                                  printType: printType,
+                                  previewLink: previewLink,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BookDetailPage(
+                                  title: title,
+                                  imageUrl: 'no_image',
+                                  description: description,
+                                  author: author,
+                                  publishedDate: publishedDate,
+                                  categories: categories,
+                                  printType: printType,
+                                  previewLink: previewLink,
+                                ),
+                              ),
+                            );
+                          }
                         },
                         child: Column(
                           children: [
-                            // Book Image
                             Container(
                               width: 200,
                               height: 300,
@@ -149,9 +163,20 @@ Widget popularBook() {
                                       )
                                     : null,
                               ),
+                              child: imageUrl == null
+                                  ? const Center(
+                                      child: Text(
+                                        'No Image Found',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    )
+                                  : null,
                             ),
                             const SizedBox(height: 8),
-                            // Book Title
                             SizedBox(
                               width: 200,
                               child: Text(

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "461275719842",
+    "project_id": "book-recommendation-webs-11149",
+    "storage_bucket": "book-recommendation-webs-11149.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461275719842:android:656e5a886cb1a4d1598ffb",
+        "android_client_info": {
+          "package_name": "com.example.appdev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1CwwHv97TCsTbpTJ9kGN3ayCxyk2ldmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
